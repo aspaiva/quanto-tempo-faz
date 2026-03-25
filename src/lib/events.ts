@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export interface DateEvent {
   id: string;
   label: string;
@@ -44,12 +46,40 @@ export function totalDays(dateStr: string): number {
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
-export function loadEvents(): DateEvent[] {
-  try {
-    return JSON.parse(localStorage.getItem("qtf-events") || "[]");
-  } catch { return []; }
+export async function loadEvents(): Promise<DateEvent[]> {
+  const { data, error } = await supabase
+    .from("events")
+    .select("id, label, category, date")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map((e) => ({ ...e, date: e.date }));
 }
 
-export function saveEvents(events: DateEvent[]) {
-  localStorage.setItem("qtf-events", JSON.stringify(events));
+export async function saveEvent(event: Omit<DateEvent, "id"> & { id?: string }): Promise<DateEvent> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Não autenticado");
+
+  if (event.id) {
+    const { data, error } = await supabase
+      .from("events")
+      .update({ label: event.label, category: event.category, date: event.date })
+      .eq("id", event.id)
+      .select("id, label, category, date")
+      .single();
+    if (error) throw error;
+    return data;
+  } else {
+    const { data, error } = await supabase
+      .from("events")
+      .insert({ label: event.label, category: event.category, date: event.date, user_id: user.id })
+      .select("id, label, category, date")
+      .single();
+    if (error) throw error;
+    return data;
+  }
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  const { error } = await supabase.from("events").delete().eq("id", id);
+  if (error) throw error;
 }
