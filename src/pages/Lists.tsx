@@ -48,8 +48,9 @@ const Lists = () => {
       setLists((prev) => prev.map((l) => (l.id === editingList.id ? { ...l, name: editName.trim() } : l)));
       setEditingList(null);
       toast.success("Lista atualizada");
-    } catch {
-      toast.error("Erro ao atualizar lista");
+    } catch (e: any) {
+      console.error("Erro ao atualizar lista:", e);
+      toast.error(e?.message || "Erro ao atualizar lista");
     }
   };
 
