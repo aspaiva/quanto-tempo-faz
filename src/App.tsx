@@ -40,6 +40,8 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={session ? <Index /> : <Auth />} />
+            <Route path="/lists" element={session ? <Lists /> : <Auth />} />
+            <Route path="/lists/:id" element={session ? <ListDetail /> : <Auth />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
