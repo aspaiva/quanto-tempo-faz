@@ -108,22 +108,8 @@ export async function getListEvents(listId: string): Promise<string[]> {
 }
 
 export async function joinListById(listId: string): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Não autenticado");
-
-  // Check list exists
-  const { data: list, error: le } = await supabase
-    .from("lists")
-    .select("id, owner_id")
-    .eq("id", listId)
-    .maybeSingle();
-  if (le) throw le;
-  if (!list) throw new Error("Lista não encontrada");
-  if (list.owner_id === user.id) throw new Error("Você já é o dono desta lista");
-
-  const { error } = await supabase.from("list_members").insert({ list_id: listId, user_id: user.id });
+  const { error } = await supabase.rpc("join_list", { _list_id: listId });
   if (error) {
-    if (error.code === "23505") throw new Error("Você já faz parte desta lista");
-    throw error;
+    throw new Error(error.message || "Erro ao entrar na lista");
   }
 }
