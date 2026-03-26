@@ -17,6 +17,7 @@ const Index = () => {
   const [editEvent, setEditEvent] = useState<DateEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadEvents()
