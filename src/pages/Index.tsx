@@ -8,11 +8,14 @@ import { DateEvent, loadEvents, saveEvent, deleteEvent } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type ViewMode = "cards" | "list";
+
 const Index = () => {
   const [events, setEvents] = useState<DateEvent[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editEvent, setEditEvent] = useState<DateEvent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   useEffect(() => {
     loadEvents()
