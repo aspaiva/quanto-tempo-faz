@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Plus, Clock, LogOut } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
+import { EventListItem } from "@/components/EventListItem";
 import { EventFormDialog } from "@/components/EventFormDialog";
 import { DateEvent, loadEvents, saveEvent, deleteEvent } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
