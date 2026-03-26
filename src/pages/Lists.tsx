@@ -59,8 +59,9 @@ const Lists = () => {
       await deleteList(id);
       setLists((prev) => prev.filter((l) => l.id !== id));
       toast.success("Lista excluída");
-    } catch {
-      toast.error("Erro ao excluir lista");
+    } catch (e: any) {
+      console.error("Erro ao excluir lista:", e);
+      toast.error(e?.message || "Erro ao excluir lista");
     }
   };
 
