@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
-import { Plus, Clock, LogOut } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
+import { EventListItem } from "@/components/EventListItem";
 import { EventFormDialog } from "@/components/EventFormDialog";
 import { DateEvent, loadEvents, saveEvent, deleteEvent } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+type ViewMode = "cards" | "list";
 
 const Index = () => {
   const [events, setEvents] = useState<DateEvent[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editEvent, setEditEvent] = useState<DateEvent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   useEffect(() => {
     loadEvents()
@@ -66,6 +70,26 @@ const Index = () => {
             <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo faz</h1>
           </div>
           <div className="flex items-center gap-2">
+            <div className="flex rounded-md border border-border">
+              <Button
+                variant={viewMode === "cards" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-r-none"
+                onClick={() => setViewMode("cards")}
+                title="Cartões"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-l-none"
+                onClick={() => setViewMode("list")}
+                title="Lista"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
             <Button onClick={handleOpenNew} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Novo evento
             </Button>
@@ -95,11 +119,19 @@ const Index = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
-            ))}
-          </div>
+          viewMode === "cards" ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {events.map((event) => (
+                <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {events.map((event) => (
+                <EventListItem key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
+              ))}
+            </div>
+          )
         )}
       </main>
 
