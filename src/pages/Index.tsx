@@ -119,11 +119,19 @@ const Index = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
-            ))}
-          </div>
+          viewMode === "cards" ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {events.map((event) => (
+                <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {events.map((event) => (
+                <EventListItem key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
+              ))}
+            </div>
+          )
         )}
       </main>
 
