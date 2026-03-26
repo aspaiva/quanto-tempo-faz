@@ -70,6 +70,26 @@ const Index = () => {
             <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo faz</h1>
           </div>
           <div className="flex items-center gap-2">
+            <div className="flex rounded-md border border-border">
+              <Button
+                variant={viewMode === "cards" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-r-none"
+                onClick={() => setViewMode("cards")}
+                title="Cartões"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-l-none"
+                onClick={() => setViewMode("list")}
+                title="Lista"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
             <Button onClick={handleOpenNew} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Novo evento
             </Button>
