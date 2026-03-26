@@ -41,12 +41,102 @@ export type Database = {
         }
         Relationships: []
       }
+      list_events: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          list_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          list_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          list_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "list_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "list_events_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      list_members: {
+        Row: {
+          created_at: string
+          id: string
+          list_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          list_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          list_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "list_members_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_list_accessible: {
+        Args: { _list_id: string; _user_id: string }
+        Returns: boolean
+      }
+      join_list: { Args: { _list_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

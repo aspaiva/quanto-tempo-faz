@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
@@ -16,6 +17,7 @@ const Index = () => {
   const [editEvent, setEditEvent] = useState<DateEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadEvents()
@@ -90,6 +92,9 @@ const Index = () => {
                 <List className="h-4 w-4" />
               </Button>
             </div>
+            <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5">
+              <FolderOpen className="h-4 w-4" /> Listas
+            </Button>
             <Button onClick={handleOpenNew} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Novo evento
             </Button>
