@@ -35,8 +35,9 @@ const Lists = () => {
       setNewName("");
       setCreateOpen(false);
       toast.success("Lista criada");
-    } catch {
-      toast.error("Erro ao criar lista");
+    } catch (e: any) {
+      console.error("Erro ao criar lista:", e);
+      toast.error(e?.message || "Erro ao criar lista");
     }
   };
 
@@ -47,8 +48,9 @@ const Lists = () => {
       setLists((prev) => prev.map((l) => (l.id === editingList.id ? { ...l, name: editName.trim() } : l)));
       setEditingList(null);
       toast.success("Lista atualizada");
-    } catch {
-      toast.error("Erro ao atualizar lista");
+    } catch (e: any) {
+      console.error("Erro ao atualizar lista:", e);
+      toast.error(e?.message || "Erro ao atualizar lista");
     }
   };
 
@@ -57,8 +59,9 @@ const Lists = () => {
       await deleteList(id);
       setLists((prev) => prev.filter((l) => l.id !== id));
       toast.success("Lista excluída");
-    } catch {
-      toast.error("Erro ao excluir lista");
+    } catch (e: any) {
+      console.error("Erro ao excluir lista:", e);
+      toast.error(e?.message || "Erro ao excluir lista");
     }
   };
 
