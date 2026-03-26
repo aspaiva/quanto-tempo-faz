@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
