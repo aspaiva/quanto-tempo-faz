@@ -35,8 +35,9 @@ const Lists = () => {
       setNewName("");
       setCreateOpen(false);
       toast.success("Lista criada");
-    } catch {
-      toast.error("Erro ao criar lista");
+    } catch (e: any) {
+      console.error("Erro ao criar lista:", e);
+      toast.error(e?.message || "Erro ao criar lista");
     }
   };
 
