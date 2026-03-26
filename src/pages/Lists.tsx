@@ -167,7 +167,7 @@ const Lists = () => {
                         title="Copiar ID para compartilhar"
                         onClick={() => copyId(list.id)}
                       >
-                        {copiedId === list.id ? <Check className="h-4 w-4 text-green-600" /> : <Share2 className="h-4 w-4" />}
+                        {copiedId === list.id ? <Check className="h-4 w-4 text-accent" /> : <Share2 className="h-4 w-4" />}
                       </Button>
                       <Button
                         variant="ghost"
