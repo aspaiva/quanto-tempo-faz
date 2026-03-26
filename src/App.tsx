@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Lists from "./pages/Lists";
+import ListDetail from "./pages/ListDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
