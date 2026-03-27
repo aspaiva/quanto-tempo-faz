@@ -191,13 +191,13 @@ const ListDetail = () => {
           <div className="flex flex-col gap-2">
             {listEvents.map((event) => (
               <div key={event.id} className="relative">
-                <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} />
+                <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => handleRemove(event.id)}
+                    onClick={() => setConfirmRemoveId(event.id)}
                     title="Remover da lista"
                   >
                     <X className="h-4 w-4" />
