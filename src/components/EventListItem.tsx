@@ -6,6 +6,7 @@ interface EventListItemProps {
   event: DateEvent;
   onEdit: (event: DateEvent) => void;
   onDelete: (id: string) => void;
+  hideActions?: boolean;
 }
 
 export function EventListItem({ event, onEdit, onDelete }: EventListItemProps) {
