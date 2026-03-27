@@ -33,14 +33,16 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
         <span className="text-xs text-muted-foreground">({total.toLocaleString("pt-BR")}d)</span>
       </div>
 
-      <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(event)}>
-          <Pencil className="h-3.5 w-3.5" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)}>
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
+      {!hideActions && (
+        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(event)}>
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)}>
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
