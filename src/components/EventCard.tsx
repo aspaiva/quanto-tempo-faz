@@ -7,9 +7,10 @@ interface EventCardProps {
   event: DateEvent;
   onEdit: (event: DateEvent) => void;
   onDelete: (id: string) => void;
+  hideActions?: boolean;
 }
 
-export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
   const formattedDate = new Date(event.date).toLocaleDateString("pt-BR");
@@ -25,14 +26,16 @@ export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
             <span>{formattedDate}</span>
           </div>
         </div>
-        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(event)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        {!hideActions && (
+          <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(event)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-3">

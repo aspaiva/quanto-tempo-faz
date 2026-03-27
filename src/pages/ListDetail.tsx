@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
 import { DateEvent } from "@/lib/events";
@@ -27,6 +28,7 @@ const ListDetail = () => {
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -107,6 +109,8 @@ const ListDetail = () => {
       toast.success("Evento removido da lista");
     } catch {
       toast.error("Erro ao remover evento");
+    } finally {
+      setConfirmRemoveId(null);
     }
   };
 
@@ -168,13 +172,13 @@ const ListDetail = () => {
           <div className="grid gap-4 sm:grid-cols-2">
             {listEvents.map((event) => (
               <div key={event.id} className="relative">
-                <EventCard event={event} onEdit={() => {}} onDelete={() => {}} />
+                <EventCard event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute top-2 right-2 h-7 w-7 text-destructive hover:text-destructive bg-card/80"
-                    onClick={() => handleRemove(event.id)}
+                    onClick={() => setConfirmRemoveId(event.id)}
                     title="Remover da lista"
                   >
                     <X className="h-4 w-4" />
@@ -187,13 +191,13 @@ const ListDetail = () => {
           <div className="flex flex-col gap-2">
             {listEvents.map((event) => (
               <div key={event.id} className="relative">
-                <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} />
+                <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => handleRemove(event.id)}
+                    onClick={() => setConfirmRemoveId(event.id)}
                     title="Remover da lista"
                   >
                     <X className="h-4 w-4" />
@@ -237,6 +241,23 @@ const ListDetail = () => {
           )}
         </DialogContent>
       </Dialog>
+      {/* Confirm removal dialog */}
+      <AlertDialog open={!!confirmRemoveId} onOpenChange={(open) => !open && setConfirmRemoveId(null)}>
+        <AlertDialogContent className="font-body">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">Remover evento da lista?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O evento será removido desta lista, mas continuará existindo na conta do proprietário.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => confirmRemoveId && handleRemove(confirmRemoveId)}>
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
