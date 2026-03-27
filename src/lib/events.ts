@@ -47,9 +47,13 @@ export function totalDays(dateStr: string): number {
 }
 
 export async function loadEvents(): Promise<DateEvent[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Não autenticado");
+
   const { data, error } = await supabase
     .from("events")
     .select("id, label, category, date")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data || []).map((e) => ({ ...e, date: e.date }));
