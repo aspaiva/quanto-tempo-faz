@@ -136,6 +136,10 @@ export type Database = {
         Args: { _list_id: string; _user_id: string }
         Returns: boolean
       }
+      is_list_owner: {
+        Args: { _list_id: string; _user_id: string }
+        Returns: boolean
+      }
       join_list: { Args: { _list_id: string }; Returns: undefined }
     }
     Enums: {
