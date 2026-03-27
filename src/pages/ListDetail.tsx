@@ -5,48 +5,94 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
-import { DateEvent, loadEvents } from "@/lib/events";
+import { DateEvent } from "@/lib/events";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type ViewMode = "cards" | "list";
 
+interface ListEventWithOwner extends DateEvent {
+  user_id: string;
+}
+
 const ListDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [listName, setListName] = useState("");
-  const [listEventIds, setListEventIds] = useState<string[]>([]);
-  const [allEvents, setAllEvents] = useState<DateEvent[]>([]);
+  const [listOwnerId, setListOwnerId] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [listEvents, setListEvents] = useState<ListEventWithOwner[]>([]);
+  const [userEvents, setUserEvents] = useState<DateEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   useEffect(() => {
     if (!id) return;
-    Promise.all([
-      supabase.from("lists").select("name").eq("id", id).single(),
-      getListEvents(id),
-      loadEvents(),
-    ])
-      .then(([listRes, eventIds, events]) => {
+
+    const load = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        setCurrentUserId(user.id);
+
+        const [listRes, eventIds] = await Promise.all([
+          supabase.from("lists").select("name, owner_id").eq("id", id).single(),
+          getListEvents(id),
+        ]);
         if (listRes.error) throw listRes.error;
         setListName(listRes.data.name);
-        setListEventIds(eventIds);
-        setAllEvents(events);
-      })
-      .catch(() => toast.error("Erro ao carregar lista"))
-      .finally(() => setLoading(false));
+        setListOwnerId(listRes.data.owner_id);
+
+        // Load events that are in the list (RLS now allows seeing shared events)
+        if (eventIds.length > 0) {
+          const { data: evts, error } = await supabase
+            .from("events")
+            .select("id, label, category, date, user_id")
+            .in("id", eventIds);
+          if (error) throw error;
+          setListEvents((evts || []) as ListEventWithOwner[]);
+        } else {
+          setListEvents([]);
+        }
+
+        // Load user's own events for the "add" dialog
+        const { data: myEvts, error: myErr } = await supabase
+          .from("events")
+          .select("id, label, category, date")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+        if (myErr) throw myErr;
+        setUserEvents(myEvts || []);
+      } catch {
+        toast.error("Erro ao carregar lista");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, [id]);
 
-  const listEvents = allEvents.filter((e) => listEventIds.includes(e.id));
-  const availableEvents = allEvents.filter((e) => !listEventIds.includes(e.id));
+  const listEventIds = listEvents.map((e) => e.id);
+  const availableEvents = userEvents.filter((e) => !listEventIds.includes(e.id));
+
+  const canRemoveEvent = (event: ListEventWithOwner) => {
+    // List owner can remove any event; event owner can remove their own
+    return currentUserId === listOwnerId || currentUserId === event.user_id;
+  };
 
   const handleAdd = async (eventId: string) => {
     if (!id) return;
     try {
       await addEventToList(id, eventId);
-      setListEventIds((prev) => [...prev, eventId]);
+      // Reload the event data
+      const { data } = await supabase
+        .from("events")
+        .select("id, label, category, date, user_id")
+        .eq("id", eventId)
+        .single();
+      if (data) setListEvents((prev) => [...prev, data as ListEventWithOwner]);
       toast.success("Evento adicionado à lista");
     } catch {
       toast.error("Erro ao adicionar evento");
@@ -57,7 +103,7 @@ const ListDetail = () => {
     if (!id) return;
     try {
       await removeEventFromList(id, eventId);
-      setListEventIds((prev) => prev.filter((eid) => eid !== eventId));
+      setListEvents((prev) => prev.filter((e) => e.id !== eventId));
       toast.success("Evento removido da lista");
     } catch {
       toast.error("Erro ao remover evento");
@@ -123,15 +169,17 @@ const ListDetail = () => {
             {listEvents.map((event) => (
               <div key={event.id} className="relative">
                 <EventCard event={event} onEdit={() => {}} onDelete={() => {}} />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-2 right-2 h-7 w-7 text-destructive hover:text-destructive bg-card/80"
-                  onClick={() => handleRemove(event.id)}
-                  title="Remover da lista"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                {canRemoveEvent(event) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7 text-destructive hover:text-destructive bg-card/80"
+                    onClick={() => handleRemove(event.id)}
+                    title="Remover da lista"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -140,15 +188,17 @@ const ListDetail = () => {
             {listEvents.map((event) => (
               <div key={event.id} className="relative">
                 <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 text-destructive hover:text-destructive"
-                  onClick={() => handleRemove(event.id)}
-                  title="Remover da lista"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                {canRemoveEvent(event) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 text-destructive hover:text-destructive"
+                    onClick={() => handleRemove(event.id)}
+                    title="Remover da lista"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
