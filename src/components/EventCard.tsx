@@ -7,6 +7,7 @@ interface EventCardProps {
   event: DateEvent;
   onEdit: (event: DateEvent) => void;
   onDelete: (id: string) => void;
+  hideActions?: boolean;
 }
 
 export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
