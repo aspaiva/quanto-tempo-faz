@@ -13,8 +13,8 @@ export default {
       },
     },
     fontFamily: {
-      display: ['Playfair Display', 'serif'],
-      body: ['Source Sans 3', 'sans-serif'],
+      display: ['Raleway', 'sans-serif'],
+      body: ['DM Sans', 'sans-serif'],
     },
     extend: {
       colors: {
