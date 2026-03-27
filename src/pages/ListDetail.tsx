@@ -241,6 +241,23 @@ const ListDetail = () => {
           )}
         </DialogContent>
       </Dialog>
+      {/* Confirm removal dialog */}
+      <AlertDialog open={!!confirmRemoveId} onOpenChange={(open) => !open && setConfirmRemoveId(null)}>
+        <AlertDialogContent className="font-body">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">Remover evento da lista?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O evento será removido desta lista, mas continuará existindo na conta do proprietário.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => confirmRemoveId && handleRemove(confirmRemoveId)}>
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
