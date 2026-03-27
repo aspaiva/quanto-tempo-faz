@@ -172,13 +172,13 @@ const ListDetail = () => {
           <div className="grid gap-4 sm:grid-cols-2">
             {listEvents.map((event) => (
               <div key={event.id} className="relative">
-                <EventCard event={event} onEdit={() => {}} onDelete={() => {}} />
+                <EventCard event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute top-2 right-2 h-7 w-7 text-destructive hover:text-destructive bg-card/80"
-                    onClick={() => handleRemove(event.id)}
+                    onClick={() => setConfirmRemoveId(event.id)}
                     title="Remover da lista"
                   >
                     <X className="h-4 w-4" />
