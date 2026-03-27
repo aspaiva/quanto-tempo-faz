@@ -9,7 +9,7 @@ interface EventListItemProps {
   hideActions?: boolean;
 }
 
-export function EventListItem({ event, onEdit, onDelete }: EventListItemProps) {
+export function EventListItem({ event, onEdit, onDelete, hideActions }: EventListItemProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
   const formattedDate = new Date(event.date).toLocaleDateString("pt-BR");
