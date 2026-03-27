@@ -109,6 +109,8 @@ const ListDetail = () => {
       toast.success("Evento removido da lista");
     } catch {
       toast.error("Erro ao remover evento");
+    } finally {
+      setConfirmRemoveId(null);
     }
   };
 
