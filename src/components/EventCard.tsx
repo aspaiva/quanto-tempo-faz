@@ -10,7 +10,7 @@ interface EventCardProps {
   hideActions?: boolean;
 }
 
-export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
   const formattedDate = new Date(event.date).toLocaleDateString("pt-BR");
