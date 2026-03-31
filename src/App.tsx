@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +14,14 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function RequireAuth({ children, session }: { children: React.ReactNode; session: Session | null }) {
+  const location = useLocation();
+  if (!session) {
+    return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+  return <>{children}</>;
+}
 
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -40,9 +48,10 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={session ? <Index /> : <Auth />} />
-            <Route path="/lists" element={session ? <Lists /> : <Auth />} />
-            <Route path="/lists/:id" element={session ? <ListDetail /> : <Auth />} />
+            <Route path="/auth" element={session ? <RedirectAfterAuth /> : <Auth />} />
+            <Route path="/" element={<RequireAuth session={session}><Index /></RequireAuth>} />
+            <Route path="/lists" element={<RequireAuth session={session}><Lists /></RequireAuth>} />
+            <Route path="/lists/:id" element={<RequireAuth session={session}><ListDetail /></RequireAuth>} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -51,5 +60,12 @@ const App = () => {
     </QueryClientProvider>
   );
 };
+
+function RedirectAfterAuth() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get("redirect") || "/";
+  return <Navigate to={redirect} replace />;
+}
 
 export default App;

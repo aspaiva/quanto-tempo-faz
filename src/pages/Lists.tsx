@@ -168,8 +168,8 @@ const Lists = () => {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        title="Copiar ID para compartilhar"
-                        onClick={() => copyId(list.id)}
+                        title="Copiar link para compartilhar"
+                        onClick={() => copyLink(list.id)}
                       >
                         {copiedId === list.id ? <Check className="h-4 w-4 text-accent" /> : <Share2 className="h-4 w-4" />}
                       </Button>
