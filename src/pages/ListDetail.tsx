@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon } from "lucide-react";
+import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
-import { DateEvent } from "@/lib/events";
+import { DateEvent, saveEvent } from "@/lib/events";
+import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -29,6 +30,7 @@ const ListDetail = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+  const [newEventOpen, setNewEventOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -107,6 +109,24 @@ const ListDetail = () => {
   const canRemoveEvent = (event: ListEventWithOwner) => {
     // List owner can remove any event; event owner can remove their own
     return currentUserId === listOwnerId || currentUserId === event.user_id;
+  };
+
+  const handleNewEventSave = async (data: Omit<DateEvent, "id"> & { id?: string }) => {
+    if (!id) return;
+    try {
+      const saved = await saveEvent(data);
+      setUserEvents((prev) => [saved, ...prev]);
+      await addEventToList(id, saved.id);
+      const { data: full } = await supabase
+        .from("events")
+        .select("id, label, category, date, user_id")
+        .eq("id", saved.id)
+        .single();
+      if (full) setListEvents((prev) => [...prev, full as ListEventWithOwner]);
+      toast.success("Evento criado e adicionado à lista");
+    } catch {
+      toast.error("Erro ao criar evento");
+    }
   };
 
   const handleAdd = async (eventId: string) => {
@@ -240,6 +260,18 @@ const ListDetail = () => {
           <DialogHeader>
             <DialogTitle className="font-display">Adicionar evento à lista</DialogTitle>
           </DialogHeader>
+          <div className="mb-3">
+            <Button
+              variant="outline"
+              className="w-full gap-1.5"
+              onClick={() => {
+                setAddOpen(false);
+                setNewEventOpen(true);
+              }}
+            >
+              <PlusCircle className="h-4 w-4" /> Cadastrar novo evento
+            </Button>
+          </div>
           {availableEvents.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
               Todos os seus eventos já estão nesta lista, ou você ainda não cadastrou eventos.
@@ -283,6 +315,7 @@ const ListDetail = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <EventFormDialog open={newEventOpen} onOpenChange={setNewEventOpen} onSave={handleNewEventSave} editEvent={null} />
     </div>
   );
 };
