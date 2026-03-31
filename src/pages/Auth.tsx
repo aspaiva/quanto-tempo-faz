@@ -17,7 +17,14 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isLogin) {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
+        setMode("login");
+      } else if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
@@ -39,7 +46,7 @@ const Auth = () => {
           <Clock className="h-8 w-8 text-primary" />
           <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo faz</h1>
           <p className="text-sm text-muted-foreground">
-            {isLogin ? "Entre na sua conta" : "Crie sua conta"}
+            {mode === "login" ? "Entre na sua conta" : mode === "signup" ? "Crie sua conta" : "Recupere sua senha"}
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -47,18 +54,25 @@ const Auth = () => {
             <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-          </div>
+          {mode !== "forgot" && (
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+            </div>
+          )}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Aguarde..." : isLogin ? "Entrar" : "Criar conta"}
+            {loading ? "Aguarde..." : mode === "login" ? "Entrar" : mode === "signup" ? "Criar conta" : "Enviar e-mail de recuperação"}
           </Button>
         </form>
+        {mode === "login" && (
+          <button onClick={() => setMode("forgot")} className="mt-2 block w-full text-center text-sm text-muted-foreground hover:text-primary hover:underline">
+            Esqueci minha senha
+          </button>
+        )}
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
-          <button onClick={() => setIsLogin(!isLogin)} className="font-medium text-primary hover:underline">
-            {isLogin ? "Criar conta" : "Entrar"}
+          {mode === "signup" ? "Já tem conta?" : "Não tem conta?"}{" "}
+          <button onClick={() => setMode(mode === "signup" ? "login" : "signup")} className="font-medium text-primary hover:underline">
+            {mode === "signup" ? "Entrar" : "Criar conta"}
           </button>
         </p>
       </Card>
