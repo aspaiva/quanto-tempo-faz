@@ -111,6 +111,24 @@ const ListDetail = () => {
     return currentUserId === listOwnerId || currentUserId === event.user_id;
   };
 
+  const handleNewEventSave = async (data: Omit<DateEvent, "id"> & { id?: string }) => {
+    if (!id) return;
+    try {
+      const saved = await saveEvent(data);
+      setUserEvents((prev) => [saved, ...prev]);
+      await addEventToList(id, saved.id);
+      const { data: full } = await supabase
+        .from("events")
+        .select("id, label, category, date, user_id")
+        .eq("id", saved.id)
+        .single();
+      if (full) setListEvents((prev) => [...prev, full as ListEventWithOwner]);
+      toast.success("Evento criado e adicionado à lista");
+    } catch {
+      toast.error("Erro ao criar evento");
+    }
+  };
+
   const handleAdd = async (eventId: string) => {
     if (!id) return;
     try {
