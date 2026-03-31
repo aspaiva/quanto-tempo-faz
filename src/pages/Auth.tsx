@@ -8,7 +8,7 @@ import { Clock } from "lucide-react";
 import { toast } from "sonner";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
