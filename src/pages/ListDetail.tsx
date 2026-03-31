@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
-import { DateEvent } from "@/lib/events";
+import { DateEvent, saveEvent } from "@/lib/events";
+import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
