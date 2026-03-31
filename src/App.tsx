@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Lists from "./pages/Lists";
 import ListDetail from "./pages/ListDetail";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => {
             <Route path="/" element={session ? <Index /> : <Auth />} />
             <Route path="/lists" element={session ? <Lists /> : <Auth />} />
             <Route path="/lists/:id" element={session ? <ListDetail /> : <Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
