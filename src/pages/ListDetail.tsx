@@ -315,6 +315,7 @@ const ListDetail = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <EventFormDialog open={newEventOpen} onOpenChange={setNewEventOpen} onSave={handleNewEventSave} editEvent={null} />
     </div>
   );
 };
