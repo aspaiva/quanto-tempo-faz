@@ -30,6 +30,7 @@ const ListDetail = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+  const [newEventOpen, setNewEventOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
