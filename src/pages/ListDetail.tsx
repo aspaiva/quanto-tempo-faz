@@ -39,6 +39,31 @@ const ListDetail = () => {
         if (!user) return;
         setCurrentUserId(user.id);
 
+        // Auto-join if user accessed via shared link and is not yet a member/owner
+        const { data: listCheck } = await supabase
+          .from("lists")
+          .select("owner_id")
+          .eq("id", id)
+          .single();
+
+        if (listCheck && listCheck.owner_id !== user.id) {
+          const { data: membership } = await supabase
+            .from("list_members")
+            .select("id")
+            .eq("list_id", id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (!membership) {
+            try {
+              await supabase.rpc("join_list", { _list_id: id });
+              toast.success("Você entrou na lista!");
+            } catch {
+              // ignore if already member
+            }
+          }
+        }
+
         const [listRes, eventIds] = await Promise.all([
           supabase.from("lists").select("name, owner_id").eq("id", id).single(),
           getListEvents(id),
