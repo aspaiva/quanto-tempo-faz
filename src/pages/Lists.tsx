@@ -79,10 +79,11 @@ const Lists = () => {
     }
   };
 
-  const copyId = (id: string) => {
-    navigator.clipboard.writeText(id);
+  const copyLink = (id: string) => {
+    const link = `${window.location.origin}/lists/${id}`;
+    navigator.clipboard.writeText(link);
     setCopiedId(id);
-    toast.success("ID copiado!");
+    toast.success("Link copiado!");
     setTimeout(() => setCopiedId(null), 2000);
   };
 
