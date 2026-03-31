@@ -15,16 +15,25 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for recovery event
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setReady(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+        if (session) setReady(true);
       }
     });
-    // Also check hash for type=recovery
-    if (window.location.hash.includes("type=recovery")) {
+
+    // Check if already has a session (token was already exchanged)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true);
+    });
+
+    // Also check hash/query for type=recovery
+    if (
+      window.location.hash.includes("type=recovery") ||
+      window.location.search.includes("type=recovery")
+    ) {
       setReady(true);
     }
+
     return () => subscription.unsubscribe();
   }, []);
 
