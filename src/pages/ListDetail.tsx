@@ -260,6 +260,18 @@ const ListDetail = () => {
           <DialogHeader>
             <DialogTitle className="font-display">Adicionar evento à lista</DialogTitle>
           </DialogHeader>
+          <div className="mb-3">
+            <Button
+              variant="outline"
+              className="w-full gap-1.5"
+              onClick={() => {
+                setAddOpen(false);
+                setNewEventOpen(true);
+              }}
+            >
+              <PlusCircle className="h-4 w-4" /> Cadastrar novo evento
+            </Button>
+          </div>
           {availableEvents.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
               Todos os seus eventos já estão nesta lista, ou você ainda não cadastrou eventos.
