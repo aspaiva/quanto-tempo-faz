@@ -32,6 +32,7 @@ const ListDetail = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const [newEventOpen, setNewEventOpen] = useState(false);
+  const [gcalBatchOpen, setGcalBatchOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
