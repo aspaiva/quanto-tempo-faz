@@ -323,6 +323,7 @@ const ListDetail = () => {
         </AlertDialogContent>
       </AlertDialog>
       <EventFormDialog open={newEventOpen} onOpenChange={setNewEventOpen} onSave={handleNewEventSave} editEvent={null} />
+      <GoogleCalendarDialog open={gcalBatchOpen} onOpenChange={setGcalBatchOpen} events={listEvents} mode="batch" />
     </div>
   );
 };
