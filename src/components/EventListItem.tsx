@@ -34,6 +34,10 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
         <span className="text-xs text-muted-foreground">({total.toLocaleString("pt-BR")}d)</span>
       </div>
 
+      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => downloadICS(event)} title="Exportar para calendário">
+        <Download className="h-3.5 w-3.5" />
+      </Button>
+
       {!hideActions && (
         <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(event)}>

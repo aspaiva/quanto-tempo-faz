@@ -45,9 +45,14 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
         <TimeBlock value={days} label={days === 1 ? "dia" : "dias"} />
       </div>
 
-      <p className="mt-3 text-center text-sm text-muted-foreground">
-        Total: <span className="font-semibold text-foreground">{total.toLocaleString("pt-BR")}</span> dias
-      </p>
+      <div className="mt-3 flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Total: <span className="font-semibold text-foreground">{total.toLocaleString("pt-BR")}</span> dias
+        </p>
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => downloadICS(event)} title="Exportar para calendário">
+          <Download className="h-3.5 w-3.5" />
+        </Button>
+      </div>
     </Card>
   );
 }
