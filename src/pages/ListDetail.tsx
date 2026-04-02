@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle } from "lucide-react";
+import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -11,6 +11,7 @@ import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 
 type ViewMode = "cards" | "list";
 
@@ -31,6 +32,7 @@ const ListDetail = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const [newEventOpen, setNewEventOpen] = useState(false);
+  const [gcalBatchOpen, setGcalBatchOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -188,6 +190,11 @@ const ListDetail = () => {
                 <ListIcon className="h-4 w-4" />
               </Button>
             </div>
+            {listEvents.length > 0 && (
+              <Button onClick={() => setGcalBatchOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Adicionar todos ao Google Calendar">
+                <CalendarPlus className="h-4 w-4" /> Google Calendar
+              </Button>
+            )}
             <Button onClick={() => setAddOpen(true)} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Adicionar evento
             </Button>
@@ -316,6 +323,7 @@ const ListDetail = () => {
         </AlertDialogContent>
       </AlertDialog>
       <EventFormDialog open={newEventOpen} onOpenChange={setNewEventOpen} onSave={handleNewEventSave} editEvent={null} />
+      <GoogleCalendarDialog open={gcalBatchOpen} onOpenChange={setGcalBatchOpen} events={listEvents} mode="batch" />
     </div>
   );
 };
