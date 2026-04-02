@@ -1,6 +1,7 @@
 import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { downloadICS } from "@/lib/ics";
 
 interface EventListItemProps {
   event: DateEvent;
@@ -32,6 +33,10 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
         <span className="font-display font-bold text-primary">{days}<span className="ml-0.5 text-xs font-normal text-muted-foreground">d</span></span>
         <span className="text-xs text-muted-foreground">({total.toLocaleString("pt-BR")}d)</span>
       </div>
+
+      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => downloadICS(event)} title="Exportar para calendário">
+        <Download className="h-3.5 w-3.5" />
+      </Button>
 
       {!hideActions && (
         <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
