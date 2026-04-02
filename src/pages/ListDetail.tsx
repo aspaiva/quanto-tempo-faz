@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle } from "lucide-react";
+import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -11,6 +11,7 @@ import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 
 type ViewMode = "cards" | "list";
 
