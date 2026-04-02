@@ -1,7 +1,8 @@
 import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
-import { Pencil, Trash2, Calendar } from "lucide-react";
+import { Pencil, Trash2, Calendar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { downloadICS } from "@/lib/ics";
 
 interface EventCardProps {
   event: DateEvent;
