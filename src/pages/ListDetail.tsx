@@ -190,6 +190,11 @@ const ListDetail = () => {
                 <ListIcon className="h-4 w-4" />
               </Button>
             </div>
+            {listEvents.length > 0 && (
+              <Button onClick={() => setGcalBatchOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Adicionar todos ao Google Calendar">
+                <CalendarPlus className="h-4 w-4" /> Google Calendar
+              </Button>
+            )}
             <Button onClick={() => setAddOpen(true)} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Adicionar evento
             </Button>
