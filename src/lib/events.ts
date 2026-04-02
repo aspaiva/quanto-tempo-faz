@@ -13,7 +13,7 @@ export const EVENT_CATEGORIES = [
   { group: "Educação", items: ["Formatura ensino médio", "Início da faculdade", "Formatura faculdade", "Mestrado", "Doutorado", "MBA", "Certificação profissional"] },
   { group: "Carreira", items: ["Primeiro emprego", "Promoção", "Novo emprego", "Abertura de empresa", "Sociedade", "Demissão", "Início de projeto"] },
   { group: "Saúde", items: ["Cirurgia", "Alta médica", "Início de tratamento", "Fim de tratamento", "Sobriedade", "Dia sem fumar"] },
-  { group: "Relacionamentos", items: ["Primeiro encontro", "Início do namoro", "Pedido de casamento", "Separação", "Reconciliação", "Amizade especial"] },
+  { group: "Relacionamentos", items: ["Primeiro encontro", "Início do namoro", "Pedido de casamento", "Separação", "Reconciliação", "Amizade especial", "Nascimento de amigo"] },
   { group: "Conquistas", items: ["Compra da casa", "Compra do carro", "Primeira viagem internacional", "Maratona", "Publicação de livro", "Prêmio recebido", "Meta alcançada"] },
   { group: "Momentos especiais", items: ["Viagem inesquecível", "Show marcante", "Dia mais feliz", "Superação pessoal", "Voluntariado", "Evento religioso", "Outro"] },
 ];
