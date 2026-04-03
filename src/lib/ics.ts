@@ -26,8 +26,8 @@ export function generateICS(event: DateEvent, recurrence: "once" | "yearly" = "o
   return lines.join("\r\n");
 }
 
-export function downloadICS(event: DateEvent) {
-  const ics = generateICS(event);
+export function downloadICS(event: DateEvent, recurrence: "once" | "yearly" = "once") {
+  const ics = generateICS(event, recurrence);
   const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
