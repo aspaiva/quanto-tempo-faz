@@ -3,6 +3,7 @@ import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
 import { Pencil, Trash2, Calendar, Download, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { downloadICS } from "@/lib/ics";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 
