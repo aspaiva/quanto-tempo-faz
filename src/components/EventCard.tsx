@@ -3,6 +3,7 @@ import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
 import { Pencil, Trash2, Calendar, Download, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { downloadICS } from "@/lib/ics";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 
@@ -57,9 +58,17 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
               <CalendarPlus className="h-3.5 w-3.5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => downloadICS(event)} title="Exportar .ics">
-              <Download className="h-3.5 w-3.5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7" title="Exportar .ics">
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => downloadICS(event, "once")}>Ocorrência única</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => downloadICS(event, "yearly")}>Repetir anualmente</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </Card>
