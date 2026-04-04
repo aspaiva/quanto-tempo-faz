@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Clock } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -56,7 +56,7 @@ const ResetPassword = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 font-body">
       <Card className="w-full max-w-sm border-border/60 p-6">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <Clock className="h-8 w-8 text-primary" />
+          <CalendarDays className="h-10 w-10 text-primary" strokeWidth={1.5} />
           <h1 className="font-display text-2xl font-bold text-foreground">Nova senha</h1>
           <p className="text-sm text-muted-foreground">Digite sua nova senha abaixo</p>
         </div>
