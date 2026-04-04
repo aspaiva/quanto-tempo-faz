@@ -47,7 +47,7 @@ const Auth = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 font-body">
       <Card className="w-full max-w-sm border-border/60 p-6">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <Clock className="h-8 w-8 text-primary" />
+          <CalendarDays className="h-10 w-10 text-primary" strokeWidth={1.5} />
           <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo faz</h1>
           <p className="text-sm text-muted-foreground">
             {mode === "login" ? "Entre na sua conta" : mode === "signup" ? "Crie sua conta" : "Recupere sua senha"}
