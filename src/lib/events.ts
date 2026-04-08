@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { parseLocalDate } from "@/lib/utils";
 
 export interface DateEvent {
   id: string;
@@ -19,7 +20,7 @@ export const EVENT_CATEGORIES = [
 ];
 
 export function calculateTimeSince(dateStr: string): { years: number; months: number; days: number } {
-  const past = new Date(dateStr);
+  const past = parseLocalDate(dateStr);
   const now = new Date();
 
   let years = now.getFullYear() - past.getFullYear();
@@ -40,7 +41,7 @@ export function calculateTimeSince(dateStr: string): { years: number; months: nu
 }
 
 export function totalDays(dateStr: string): number {
-  const past = new Date(dateStr);
+  const past = parseLocalDate(dateStr);
   const now = new Date();
   const diff = now.getTime() - past.getTime();
   return Math.floor(diff / (1000 * 60 * 60 * 24));

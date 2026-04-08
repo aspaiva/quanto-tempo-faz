@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
+import { parseLocalDate } from "@/lib/utils";
 import { Pencil, Trash2, Calendar, Download, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,7 +18,7 @@ interface EventCardProps {
 export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
-  const formattedDate = new Date(event.date).toLocaleDateString("pt-BR");
+  const formattedDate = parseLocalDate(event.date).toLocaleDateString("pt-BR");
   const [gcalOpen, setGcalOpen] = useState(false);
 
   return (

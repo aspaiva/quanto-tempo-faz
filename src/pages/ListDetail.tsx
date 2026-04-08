@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
 import { DateEvent, saveEvent } from "@/lib/events";
+import { parseLocalDate } from "@/lib/utils";
 import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
@@ -296,7 +297,7 @@ const ListDetail = () => {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-display text-sm font-semibold text-foreground">{event.label}</p>
-                    <p className="text-xs text-muted-foreground">{event.category} · {new Date(event.date).toLocaleDateString("pt-BR")}</p>
+                    <p className="text-xs text-muted-foreground">{event.category} · {parseLocalDate(event.date).toLocaleDateString("pt-BR")}</p>
                   </div>
                   <Plus className="h-4 w-4 shrink-0 text-primary" />
                 </button>

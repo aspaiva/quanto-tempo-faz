@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Loader2, CalendarPlus, Unlink } from "lucide-react";
 import { DateEvent } from "@/lib/events";
+import { parseLocalDate } from "@/lib/utils";
 import {
   checkGCalConnection,
   disconnectGCal,
@@ -211,7 +212,7 @@ export function GoogleCalendarDialog({ open, onOpenChange, events, mode }: Googl
               <div className="max-h-32 overflow-y-auto space-y-1">
                 {events.map((e) => (
                   <p key={e.id} className="text-sm text-foreground truncate">
-                    {e.label} — {new Date(e.date).toLocaleDateString("pt-BR")}
+                    {e.label} — {parseLocalDate(e.date).toLocaleDateString("pt-BR")}
                   </p>
                 ))}
               </div>

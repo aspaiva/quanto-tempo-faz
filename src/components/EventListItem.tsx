@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
+import { parseLocalDate } from "@/lib/utils";
 import { Pencil, Trash2, Download, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -16,7 +17,7 @@ interface EventListItemProps {
 export function EventListItem({ event, onEdit, onDelete, hideActions }: EventListItemProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
-  const formattedDate = new Date(event.date).toLocaleDateString("pt-BR");
+  const formattedDate = parseLocalDate(event.date).toLocaleDateString("pt-BR");
   const [gcalOpen, setGcalOpen] = useState(false);
 
   return (

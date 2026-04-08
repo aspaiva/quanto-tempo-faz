@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { DateEvent, EVENT_CATEGORIES } from "@/lib/events";
+import { parseLocalDate } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,7 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
       setStep("form");
       setCategory(editEvent.category);
       setLabel(editEvent.label);
-      const d = new Date(editEvent.date);
+      const d = parseLocalDate(editEvent.date);
       setDate(d);
       setDateText(`${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`);
     } else {
