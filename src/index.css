@@ -46,6 +46,10 @@ All colors MUST be HSL.
     --shadow-card: 0 2px 12px -2px hsl(25 30% 12% / 0.08);
     --shadow-card-hover: 0 8px 24px -4px hsl(25 30% 12% / 0.12);
 
+    --countdown-card: 210 60% 96%;
+    --countdown-primary: 210 65% 45%;
+    --countdown-border: 210 40% 80%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;

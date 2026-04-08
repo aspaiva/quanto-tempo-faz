@@ -19,17 +19,26 @@ export const EVENT_CATEGORIES = [
   { group: "Momentos especiais", items: ["Viagem inesquecível", "Show marcante", "Dia mais feliz", "Superação pessoal", "Voluntariado", "Evento religioso", "Outro"] },
 ];
 
+export function isFutureEvent(dateStr: string): boolean {
+  const d = parseLocalDate(dateStr);
+  const now = new Date();
+  return d.getTime() > now.getTime();
+}
+
 export function calculateTimeSince(dateStr: string): { years: number; months: number; days: number } {
-  const past = parseLocalDate(dateStr);
+  const target = parseLocalDate(dateStr);
   const now = new Date();
 
-  let years = now.getFullYear() - past.getFullYear();
-  let months = now.getMonth() - past.getMonth();
-  let days = now.getDate() - past.getDate();
+  // For future dates, swap so we calculate the difference correctly
+  const [earlier, later] = target > now ? [now, target] : [target, now];
+
+  let years = later.getFullYear() - earlier.getFullYear();
+  let months = later.getMonth() - earlier.getMonth();
+  let days = later.getDate() - earlier.getDate();
 
   if (days < 0) {
     months--;
-    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    const prevMonth = new Date(later.getFullYear(), later.getMonth(), 0);
     days += prevMonth.getDate();
   }
   if (months < 0) {
@@ -41,9 +50,9 @@ export function calculateTimeSince(dateStr: string): { years: number; months: nu
 }
 
 export function totalDays(dateStr: string): number {
-  const past = parseLocalDate(dateStr);
+  const target = parseLocalDate(dateStr);
   const now = new Date();
-  const diff = now.getTime() - past.getTime();
+  const diff = Math.abs(now.getTime() - target.getTime());
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
