@@ -5,7 +5,6 @@ export function generateICS(event: DateEvent, recurrence: "once" | "yearly" = "o
   const d = parseLocalDate(event.date);
   const dateStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   const now = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
-  const now = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
 
   const lines = [
     "BEGIN:VCALENDAR",
