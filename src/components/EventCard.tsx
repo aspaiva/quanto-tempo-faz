@@ -91,14 +91,22 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
 
 function TimeBlock({ value, label, future }: { value: number; label: string; future?: boolean }) {
   return (
-    <div className="rounded-lg py-2.5 text-center" style={future ? { backgroundColor: "hsl(var(--countdown-border) / 0.3)" } : undefined}>
-      <span
-        className="block font-display text-2xl font-bold"
-        style={{ color: future ? "hsl(var(--countdown-primary))" : undefined }}
+    <div className="flex flex-col items-center gap-1">
+      <div
+        className="flex h-16 w-full items-center justify-center rounded-xl border shadow-sm"
+        style={{
+          backgroundColor: future ? "hsl(var(--countdown-border) / 0.25)" : "hsl(var(--secondary))",
+          borderColor: future ? "hsl(var(--countdown-border) / 0.5)" : "hsl(var(--border))",
+        }}
       >
-        {value}
-      </span>
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span
+          className="font-display text-3xl font-extrabold tabular-nums"
+          style={{ color: future ? "hsl(var(--countdown-primary))" : "hsl(var(--primary))" }}
+        >
+          {value}
+        </span>
+      </div>
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
     </div>
   );
 }
