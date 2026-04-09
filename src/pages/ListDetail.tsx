@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus } from "lucide-react";
+import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
-import { DateEvent, saveEvent } from "@/lib/events";
+import { DateEvent, saveEvent, totalDays } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
 import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 
 type ViewMode = "cards" | "list";
+type SortOrder = "closest" | "farthest";
 
 interface ListEventWithOwner extends DateEvent {
   user_id: string;
@@ -34,6 +35,12 @@ const ListDetail = () => {
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const [newEventOpen, setNewEventOpen] = useState(false);
   const [gcalBatchOpen, setGcalBatchOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
+
+  const sortedListEvents = useMemo(() => {
+    const sorted = [...listEvents].sort((a, b) => totalDays(a.date) - totalDays(b.date));
+    return sortOrder === "farthest" ? sorted.reverse() : sorted;
+  }, [listEvents, sortOrder]);
 
   useEffect(() => {
     if (!id) return;
@@ -191,6 +198,16 @@ const ListDetail = () => {
                 <ListIcon className="h-4 w-4" />
               </Button>
             </div>
+            <Button
+              onClick={() => setSortOrder(s => s === "closest" ? "farthest" : "closest")}
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
+            >
+              <ArrowUpDown className="h-4 w-4" />
+              {sortOrder === "closest" ? "Próximos" : "Distantes"}
+            </Button>
             {listEvents.length > 0 && (
               <Button onClick={() => setGcalBatchOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Adicionar todos ao Google Calendar">
                 <CalendarPlus className="h-4 w-4" /> Google Calendar
@@ -223,7 +240,7 @@ const ListDetail = () => {
           </div>
         ) : viewMode === "cards" ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            {listEvents.map((event) => (
+            {sortedListEvents.map((event) => (
               <div key={event.id} className="relative">
                 <EventCard event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
@@ -242,7 +259,7 @@ const ListDetail = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {listEvents.map((event) => (
+            {sortedListEvents.map((event) => (
               <div key={event.id} className="relative">
                 <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (

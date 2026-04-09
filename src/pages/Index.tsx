@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
 import { EventFormDialog } from "@/components/EventFormDialog";
-import { DateEvent, loadEvents, saveEvent, deleteEvent } from "@/lib/events";
+import { DateEvent, loadEvents, saveEvent, deleteEvent, totalDays } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type ViewMode = "cards" | "list";
+type SortOrder = "closest" | "farthest";
 
 const Index = () => {
   const [events, setEvents] = useState<DateEvent[]>([]);
@@ -17,7 +18,13 @@ const Index = () => {
   const [editEvent, setEditEvent] = useState<DateEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
   const navigate = useNavigate();
+
+  const sortedEvents = useMemo(() => {
+    const sorted = [...events].sort((a, b) => totalDays(a.date) - totalDays(b.date));
+    return sortOrder === "farthest" ? sorted.reverse() : sorted;
+  }, [events, sortOrder]);
 
   useEffect(() => {
     loadEvents()
@@ -92,6 +99,16 @@ const Index = () => {
                 <List className="h-4 w-4" />
               </Button>
             </div>
+            <Button
+              onClick={() => setSortOrder(s => s === "closest" ? "farthest" : "closest")}
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
+            >
+              <ArrowUpDown className="h-4 w-4" />
+              {sortOrder === "closest" ? "Próximos" : "Distantes"}
+            </Button>
             <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5">
               <FolderOpen className="h-4 w-4" /> Listas
             </Button>
@@ -126,13 +143,13 @@ const Index = () => {
         ) : (
           viewMode === "cards" ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              {events.map((event) => (
+              {sortedEvents.map((event) => (
                 <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
               ))}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {events.map((event) => (
+              {sortedEvents.map((event) => (
                 <EventListItem key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
               ))}
             </div>
