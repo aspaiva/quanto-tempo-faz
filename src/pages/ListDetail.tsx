@@ -240,7 +240,7 @@ const ListDetail = () => {
           </div>
         ) : viewMode === "cards" ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            {listEvents.map((event) => (
+            {sortedListEvents.map((event) => (
               <div key={event.id} className="relative">
                 <EventCard event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
@@ -259,7 +259,7 @@ const ListDetail = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {listEvents.map((event) => (
+            {sortedListEvents.map((event) => (
               <div key={event.id} className="relative">
                 <EventListItem event={event} onEdit={() => {}} onDelete={() => {}} hideActions />
                 {canRemoveEvent(event) && (
