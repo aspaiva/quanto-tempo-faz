@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
@@ -8,6 +8,8 @@ import { EventFormDialog } from "@/components/EventFormDialog";
 import { DateEvent, loadEvents, saveEvent, deleteEvent, totalDays } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -19,12 +21,21 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const sortedEvents = useMemo(() => {
-    const sorted = [...events].sort((a, b) => totalDays(a.date) - totalDays(b.date));
+  const existingCategories = useMemo(() => {
+    const cats = [...new Set(events.map((e) => e.category))];
+    return cats.sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [events]);
+
+  const filteredAndSortedEvents = useMemo(() => {
+    let filtered = selectedCategory
+      ? events.filter((e) => e.category === selectedCategory)
+      : events;
+    const sorted = [...filtered].sort((a, b) => totalDays(a.date) - totalDays(b.date));
     return sortOrder === "farthest" ? sorted.reverse() : sorted;
-  }, [events, sortOrder]);
+  }, [events, sortOrder, selectedCategory]);
 
   useEffect(() => {
     loadEvents()
@@ -109,6 +120,38 @@ const Index = () => {
               <ArrowUpDown className="h-4 w-4" />
               {sortOrder === "closest" ? "Próximos" : "Distantes"}
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={selectedCategory ? "secondary" : "outline"}
+                  size="sm"
+                  className="gap-1.5"
+                  title="Filtrar por categoria"
+                >
+                  <Filter className="h-4 w-4" />
+                  {selectedCategory ? selectedCategory : "Filtrar"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="max-h-64 overflow-y-auto">
+                {selectedCategory && (
+                  <>
+                    <DropdownMenuItem onClick={() => setSelectedCategory(null)} className="gap-2 text-muted-foreground">
+                      <X className="h-3.5 w-3.5" /> Limpar filtro
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                {existingCategories.map((cat) => (
+                  <DropdownMenuItem
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={cat === selectedCategory ? "bg-accent font-medium" : ""}
+                  >
+                    {cat}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5">
               <FolderOpen className="h-4 w-4" /> Listas
             </Button>
@@ -123,6 +166,14 @@ const Index = () => {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-8">
+        {selectedCategory && (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Filtrando por:</span>
+            <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setSelectedCategory(null)}>
+              {selectedCategory} <X className="h-3 w-3" />
+            </Badge>
+          </div>
+        )}
         {loading ? (
           <div className="flex justify-center py-24">
             <p className="text-muted-foreground">Carregando...</p>
@@ -140,16 +191,23 @@ const Index = () => {
               <Plus className="h-4 w-4" /> Adicionar primeiro evento
             </Button>
           </div>
+        ) : filteredAndSortedEvents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <p className="text-muted-foreground">Nenhum evento encontrado para "{selectedCategory}"</p>
+            <Button variant="outline" onClick={() => setSelectedCategory(null)} className="mt-4 gap-1.5">
+              <X className="h-4 w-4" /> Limpar filtro
+            </Button>
+          </div>
         ) : (
           viewMode === "cards" ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              {sortedEvents.map((event) => (
+              {filteredAndSortedEvents.map((event) => (
                 <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
               ))}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {sortedEvents.map((event) => (
+              {filteredAndSortedEvents.map((event) => (
                 <EventListItem key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
               ))}
             </div>
