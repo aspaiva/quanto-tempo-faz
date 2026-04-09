@@ -21,7 +21,7 @@ function parseDateInput(value: string): Date | undefined {
   if (!match) return undefined;
   const [, dd, mm, yyyy] = match;
   const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
-  if (d.getFullYear() === Number(yyyy) && d.getMonth() === Number(mm) - 1 && d.getDate() === Number(dd) && d <= new Date()) {
+  if (d.getFullYear() === Number(yyyy) && d.getMonth() === Number(mm) - 1 && d.getDate() === Number(dd)) {
     return d;
   }
   return undefined;
@@ -86,7 +86,6 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
 
   const selectDay = (day: number) => {
     const d = new Date(pickerYear, pickerMonth, day);
-    if (d > today) return;
     setDate(d);
     setDateText(`${String(day).padStart(2, "0")}/${String(pickerMonth + 1).padStart(2, "0")}/${pickerYear}`);
     setShowPicker(false);
@@ -163,7 +162,7 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
                 </Button>
               </div>
               {dateText.length === 10 && !date && (
-                <p className="text-xs text-destructive">Data inválida ou no futuro</p>
+                <p className="text-xs text-destructive">Data inválida</p>
               )}
             </div>
 
@@ -201,17 +200,13 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
                   ))}
                   {Array.from({ length: daysInMonth }, (_, i) => {
                     const day = i + 1;
-                    const d = new Date(pickerYear, pickerMonth, day);
-                    const isFuture = d > today;
                     const isSelected = date && date.getDate() === day && date.getMonth() === pickerMonth && date.getFullYear() === pickerYear;
                     return (
                       <button
                         key={day}
-                        disabled={isFuture}
                         onClick={() => selectDay(day)}
                         className={`rounded py-1 text-sm transition-colors ${
                           isSelected ? "bg-primary text-primary-foreground font-bold" :
-                          isFuture ? "text-muted-foreground/40 cursor-not-allowed" :
                           "hover:bg-secondary text-foreground"
                         }`}
                       >
