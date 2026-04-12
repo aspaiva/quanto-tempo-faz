@@ -48,7 +48,7 @@ const Auth = () => {
       <Card className="w-full max-w-sm border-border/60 p-6">
         <div className="mb-6 flex flex-col items-center gap-2">
           <CalendarDays className="h-10 w-10 text-primary" strokeWidth={1.5} />
-          <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo faz</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo?</h1>
           <p className="text-sm text-muted-foreground">
             {mode === "login" ? "Entre na sua conta" : mode === "signup" ? "Crie sua conta" : "Recupere sua senha"}
           </p>
