@@ -80,7 +80,8 @@ const Lists = () => {
   };
 
   const copyLink = (id: string) => {
-    const link = `${window.location.origin}/lists/${id}`;
+    const baseUrl = "https://quantotempofaz.lovable.app";
+    const link = `${baseUrl}/lists/${id}`;
     navigator.clipboard.writeText(link);
     setCopiedId(id);
     toast.success("Link copiado!");
