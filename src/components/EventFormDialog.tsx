@@ -138,11 +138,9 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
           </ScrollArea>
         ) : (
           <div className="space-y-4">
-            {!editEvent && (
-              <button onClick={() => setStep("category")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-                <ChevronLeft className="h-4 w-4" /> Voltar
-              </button>
-            )}
+            <button onClick={() => setStep("category")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+              <ChevronLeft className="h-4 w-4" /> {editEvent ? "Mudar categoria" : "Voltar"}
+            </button>
             <p className="text-sm text-muted-foreground">Categoria: <span className="font-medium text-foreground">{category}</span></p>
             <div className="space-y-2">
               <Label htmlFor="label">Identificação (pessoa ou evento)</Label>
