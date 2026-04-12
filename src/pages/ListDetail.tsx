@@ -38,8 +38,15 @@ const ListDetail = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
 
   const sortedListEvents = useMemo(() => {
-    const sorted = [...listEvents].sort((a, b) => totalDays(a.date) - totalDays(b.date));
-    return sortOrder === "farthest" ? sorted.reverse() : sorted;
+    const now = Date.now();
+    const sorted = [...listEvents].sort((a, b) => {
+      const aFuture = new Date(a.date).getTime() > now ? 0 : 1;
+      const bFuture = new Date(b.date).getTime() > now ? 0 : 1;
+      if (aFuture !== bFuture) return aFuture - bFuture;
+      const diff = totalDays(a.date) - totalDays(b.date);
+      return sortOrder === "farthest" ? -diff : diff;
+    });
+    return sorted;
   }, [listEvents, sortOrder]);
 
   useEffect(() => {
