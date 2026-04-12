@@ -53,7 +53,7 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
 
   const handleCategorySelect = (cat: string) => {
     setCategory(cat);
-    setLabel("");
+    if (!editEvent) setLabel("");
     setStep("form");
   };
 
