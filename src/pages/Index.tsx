@@ -33,8 +33,15 @@ const Index = () => {
     let filtered = selectedCategory
       ? events.filter((e) => e.category === selectedCategory)
       : events;
-    const sorted = [...filtered].sort((a, b) => totalDays(a.date) - totalDays(b.date));
-    return sortOrder === "farthest" ? sorted.reverse() : sorted;
+    const now = Date.now();
+    const sorted = [...filtered].sort((a, b) => {
+      const aFuture = new Date(a.date).getTime() > now ? 0 : 1;
+      const bFuture = new Date(b.date).getTime() > now ? 0 : 1;
+      if (aFuture !== bFuture) return aFuture - bFuture;
+      const diff = totalDays(a.date) - totalDays(b.date);
+      return sortOrder === "farthest" ? -diff : diff;
+    });
+    return sorted;
   }, [events, sortOrder, selectedCategory]);
 
   useEffect(() => {
