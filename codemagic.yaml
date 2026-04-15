@@ -7,6 +7,9 @@ workflows:
       node: 18
       xcode: latest
       cocoapods: default
+      
+    android_signing:
+      - keystore_reference
 
     triggering:
       events:
