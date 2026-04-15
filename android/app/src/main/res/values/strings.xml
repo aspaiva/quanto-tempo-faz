@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">quanto-tempo-faz</string>
+    <string name="title_activity_main">quanto-tempo-faz</string>
+    <string name="package_name">app.lovable.ecfbbc681eee4daa893bd56f36974b68</string>
+    <string name="custom_url_scheme">app.lovable.ecfbbc681eee4daa893bd56f36974b68</string>
+</resources>
