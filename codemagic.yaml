@@ -8,9 +8,13 @@ workflows:
     scripts:
       - npm install --legacy-peer-deps
       - npm run build
+      - npx cap add android || true
       - npx cap sync android
-      - cd android
-      - ./gradlew assembleDebug
+
+      - name: Build Android
+        script: |
+          cd android
+          ./gradlew assembleDebug
 
     artifacts:
       - android/app/build/outputs/**/*.apk
