@@ -11,6 +11,11 @@ workflows:
       - npx cap add android || true
       - npx cap sync android
 
+      - name: Debug
+        script: |
+          ls
+          ls android
+          
       - name: Build Android
         script: |
           cd android
