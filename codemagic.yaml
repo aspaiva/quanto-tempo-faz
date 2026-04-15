@@ -3,7 +3,7 @@ workflows:
     name: Android Debug Build
 
     environment:
-      node: 18
+      node: 22
 
     scripts:
       - npm install
