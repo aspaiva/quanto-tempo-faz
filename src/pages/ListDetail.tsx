@@ -184,14 +184,14 @@ const ListDetail = () => {
   return (
     <div className="min-h-screen bg-background font-body">
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-5">
-          <div className="flex items-center gap-2.5">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <Button onClick={() => navigate("/lists")} variant="ghost" size="icon" className="h-9 w-9">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="font-display text-xl font-bold text-foreground truncate">{listName}</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
             <div className="flex rounded-md border border-border">
               <Button
                 variant={viewMode === "cards" ? "secondary" : "ghost"}
@@ -218,15 +218,15 @@ const ListDetail = () => {
               title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
             >
               <ArrowUpDown className="h-4 w-4" />
-              {sortOrder === "closest" ? "Próximos" : "Distantes"}
+              <span className="hidden sm:inline">{sortOrder === "closest" ? "Próximos" : "Distantes"}</span>
             </Button>
             {listEvents.length > 0 && (
               <Button onClick={() => setGcalBatchOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Adicionar todos ao Google Calendar">
-                <CalendarPlus className="h-4 w-4" /> Google Calendar
+                <CalendarPlus className="h-4 w-4" /> <span className="hidden sm:inline">Google Calendar</span>
               </Button>
             )}
             <Button onClick={() => setAddOpen(true)} size="sm" className="gap-1.5">
-              <Plus className="h-4 w-4" /> Adicionar evento
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Adicionar evento</span>
             </Button>
           </div>
         </div>
