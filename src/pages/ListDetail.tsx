@@ -58,38 +58,43 @@ const ListDetail = () => {
         if (!user) return;
         setCurrentUserId(user.id);
 
-        // Auto-join if user accessed via shared link and is not yet a member/owner
-        const { data: listCheck } = await supabase
+        // Try to fetch the list. If RLS blocks it (user is not yet owner/member),
+        // attempt auto-join then retry. join_list is SECURITY DEFINER and handles
+        // the "already owner / already member" cases internally.
+        let listRes = await supabase
           .from("lists")
-          .select("owner_id")
+          .select("name, owner_id")
           .eq("id", id)
-          .single();
+          .maybeSingle();
 
-        if (listCheck && listCheck.owner_id !== user.id) {
-          const { data: membership } = await supabase
-            .from("list_members")
-            .select("id")
-            .eq("list_id", id)
-            .eq("user_id", user.id)
-            .maybeSingle();
-
-          if (!membership) {
-            try {
-              await supabase.rpc("join_list", { _list_id: id });
-              toast.success("Você entrou na lista!");
-            } catch {
-              // ignore if already member
-            }
+        if (!listRes.data) {
+          const { error: joinErr } = await supabase.rpc("join_list", { _list_id: id });
+          if (joinErr) {
+            // Lista realmente não existe ou outro erro
+            const msg = joinErr.message?.includes("não encontrada")
+              ? "Lista não encontrada"
+              : "Não foi possível acessar esta lista";
+            toast.error(msg);
+            setLoading(false);
+            return;
           }
+          toast.success("Você entrou na lista!");
+          listRes = await supabase
+            .from("lists")
+            .select("name, owner_id")
+            .eq("id", id)
+            .maybeSingle();
         }
 
-        const [listRes, eventIds] = await Promise.all([
-          supabase.from("lists").select("name, owner_id").eq("id", id).single(),
-          getListEvents(id),
-        ]);
-        if (listRes.error) throw listRes.error;
+        if (!listRes.data) {
+          toast.error("Lista não encontrada");
+          setLoading(false);
+          return;
+        }
         setListName(listRes.data.name);
         setListOwnerId(listRes.data.owner_id);
+
+        const eventIds = await getListEvents(id);
 
         // Load events that are in the list (RLS now allows seeing shared events)
         if (eventIds.length > 0) {
