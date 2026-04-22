@@ -91,12 +91,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background font-body">
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-5">
-          <div className="flex items-center gap-2.5">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Clock className="h-6 w-6 text-primary" />
-            <h1 className="font-display text-2xl font-bold text-foreground">Quanto tempo faz</h1>
+            <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">Quanto tempo faz</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
             <div className="flex rounded-md border border-border">
               <Button
                 variant={viewMode === "cards" ? "secondary" : "ghost"}
@@ -125,7 +125,7 @@ const Index = () => {
               title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
             >
               <ArrowUpDown className="h-4 w-4" />
-              {sortOrder === "closest" ? "Próximos" : "Distantes"}
+              <span className="hidden sm:inline">{sortOrder === "closest" ? "Próximos" : "Distantes"}</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -136,7 +136,7 @@ const Index = () => {
                   title="Filtrar por categoria"
                 >
                   <Filter className="h-4 w-4" />
-                  {selectedCategory ? selectedCategory : "Filtrar"}
+                  <span className="hidden sm:inline">{selectedCategory ? selectedCategory : "Filtrar"}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="max-h-64 overflow-y-auto">
@@ -160,10 +160,10 @@ const Index = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5">
-              <FolderOpen className="h-4 w-4" /> Listas
+              <FolderOpen className="h-4 w-4" /> <span className="hidden sm:inline">Listas</span>
             </Button>
             <Button onClick={handleOpenNew} size="sm" className="gap-1.5">
-              <Plus className="h-4 w-4" /> Novo evento
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo evento</span>
             </Button>
             <Button onClick={handleLogout} variant="ghost" size="icon" className="h-9 w-9" title="Sair">
               <LogOut className="h-4 w-4" />
