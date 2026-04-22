@@ -95,20 +95,20 @@ const Lists = () => {
   return (
     <div className="min-h-screen bg-background font-body">
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-5">
-          <div className="flex items-center gap-2.5">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Clock className="h-6 w-6 text-primary" />
-            <h1 className="font-display text-2xl font-bold text-foreground">Minhas Listas</h1>
+            <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">Minhas Listas</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
             <Button onClick={() => navigate("/")} variant="ghost" size="sm" className="gap-1.5">
-              <ArrowLeft className="h-4 w-4" /> Eventos
+              <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Eventos</span>
             </Button>
             <Button onClick={() => setJoinOpen(true)} variant="outline" size="sm" className="gap-1.5">
-              <Link2 className="h-4 w-4" /> Entrar em lista
+              <Link2 className="h-4 w-4" /> <span className="hidden sm:inline">Entrar em lista</span>
             </Button>
             <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
-              <Plus className="h-4 w-4" /> Nova lista
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nova lista</span>
             </Button>
             <Button onClick={handleLogout} variant="ghost" size="icon" className="h-9 w-9" title="Sair">
               <LogOut className="h-4 w-4" />
@@ -162,7 +162,7 @@ const Lists = () => {
                   </p>
                 </div>
 
-                <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-1 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
                   {list.is_owner && (
                     <>
                       <Button
