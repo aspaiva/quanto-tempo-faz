@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
@@ -166,6 +166,9 @@ const Index = () => {
             <Button onClick={handleOpenNew} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo evento</span>
             </Button>
+            <Button onClick={() => navigate("/settings/security")} variant="ghost" size="icon" className="h-9 w-9" title="Segurança">
+              <ShieldCheck className="h-4 w-4" />
+            </Button>
             <Button onClick={handleLogout} variant="ghost" size="icon" className="h-9 w-9" title="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
@@ -224,6 +227,7 @@ const Index = () => {
       </main>
 
       <EventFormDialog open={dialogOpen} onOpenChange={setDialogOpen} onSave={handleSave} editEvent={editEvent} />
+      <BiometricPostLoginPrompt />
     </div>
   );
 };
