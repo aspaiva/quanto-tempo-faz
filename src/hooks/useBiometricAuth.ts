@@ -43,10 +43,9 @@ export function useBiometricAuth(): BiometricAuthApi {
   );
 
   const signInWithBiometrics = useCallback(async () => {
-    const { email, token_hash } = await authenticate();
+    const { token_hash } = await authenticate();
     const { error } = await supabase.auth.verifyOtp({
       type: "magiclink",
-      email,
       token_hash,
     });
     if (error) throw error;
