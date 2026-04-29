@@ -35,12 +35,11 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: authHeader } } },
     );
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
-    if (claimsErr || !claims?.claims) return json({ error: "Sessão inválida" }, 401);
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) return json({ error: "Sessão inválida" }, 401);
 
-    const userId = claims.claims.sub as string;
-    const email = (claims.claims.email as string) ?? "usuario";
+    const userId = userData.user.id;
+    const email = userData.user.email ?? "usuario";
 
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
