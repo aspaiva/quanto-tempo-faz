@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { BiometricPostLoginPrompt } from "@/components/BiometricPostLoginPrompt";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
