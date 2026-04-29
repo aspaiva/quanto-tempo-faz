@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.get_credential_user(text) FROM anon, authenticated, public;
