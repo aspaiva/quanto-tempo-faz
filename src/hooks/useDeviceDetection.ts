@@ -60,8 +60,10 @@ export function useDeviceDetection(): DeviceInfo {
           platformAuthenticatorAvailable = false;
         }
         try {
-          // @ts-expect-error not in all TS lib versions
-          conditionalUiAvailable = !!(await window.PublicKeyCredential.isConditionalMediationAvailable?.());
+          const PKC = window.PublicKeyCredential as unknown as {
+            isConditionalMediationAvailable?: () => Promise<boolean>;
+          };
+          conditionalUiAvailable = !!(await PKC.isConditionalMediationAvailable?.());
         } catch { /* noop */ }
       }
 
