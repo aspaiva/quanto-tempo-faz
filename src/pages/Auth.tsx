@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
+import { BiometricLoginButton } from "@/components/BiometricLoginButton";
+import { useBiometricAuth, getHasPasskeyHint } from "@/hooks/useBiometricAuth";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,8 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { biometricAvailable } = useBiometricAuth();
+  const showBiometric = mode === "login" && biometricAvailable && getHasPasskeyHint();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +72,16 @@ const Auth = () => {
             {loading ? "Aguarde..." : mode === "login" ? "Entrar" : mode === "signup" ? "Criar conta" : "Enviar e-mail de recuperação"}
           </Button>
         </form>
+        {showBiometric && (
+          <>
+            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              ou
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <BiometricLoginButton />
+          </>
+        )}
         {mode === "login" && (
           <button onClick={() => setMode("forgot")} className="mt-2 block w-full text-center text-sm text-muted-foreground hover:text-primary hover:underline">
             Esqueci minha senha
