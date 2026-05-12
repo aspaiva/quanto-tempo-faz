@@ -139,7 +139,10 @@ Deno.serve(async (req) => {
         .delete()
         .eq("challenge", challenge);
 
-      if (insertRes.error) return json({ error: insertRes.error.message }, 400);
+      if (insertRes.error) {
+        console.error("webauthn-register insert error", insertRes.error);
+        return json({ error: "Não foi possível salvar o dispositivo" }, 400);
+      }
       return json({ verified: true });
     }
 
