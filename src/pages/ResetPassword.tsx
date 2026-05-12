@@ -45,8 +45,8 @@ const ResetPassword = () => {
       if (error) throw error;
       toast.success("Senha atualizada com sucesso!");
       navigate("/");
-    } catch (err: any) {
-      toast.error(err.message || "Erro ao atualizar senha");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erro ao atualizar senha");
     } finally {
       setLoading(false);
     }

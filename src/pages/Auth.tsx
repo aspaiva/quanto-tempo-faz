@@ -39,8 +39,8 @@ const Auth = () => {
         if (error) throw error;
         toast.success("Conta criada. Verifique seu e-mail para confirmar.");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Erro na autenticação");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erro na autenticação");
     } finally {
       setLoading(false);
     }

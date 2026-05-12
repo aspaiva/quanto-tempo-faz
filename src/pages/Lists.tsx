@@ -35,9 +35,9 @@ const Lists = () => {
       setNewName("");
       setCreateOpen(false);
       toast.success("Lista criada");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Erro ao criar lista:", e);
-      toast.error(e?.message || "Erro ao criar lista");
+      toast.error(e instanceof Error ? e.message : "Erro ao criar lista");
     }
   };
 
@@ -48,9 +48,9 @@ const Lists = () => {
       setLists((prev) => prev.map((l) => (l.id === editingList.id ? { ...l, name: editName.trim() } : l)));
       setEditingList(null);
       toast.success("Lista atualizada");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Erro ao atualizar lista:", e);
-      toast.error(e?.message || "Erro ao atualizar lista");
+      toast.error(e instanceof Error ? e.message : "Erro ao atualizar lista");
     }
   };
 
@@ -59,9 +59,9 @@ const Lists = () => {
       await deleteList(id);
       setLists((prev) => prev.filter((l) => l.id !== id));
       toast.success("Lista excluída");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Erro ao excluir lista:", e);
-      toast.error(e?.message || "Erro ao excluir lista");
+      toast.error(e instanceof Error ? e.message : "Erro ao excluir lista");
     }
   };
 
@@ -74,8 +74,8 @@ const Lists = () => {
       setJoinId("");
       setJoinOpen(false);
       toast.success("Você entrou na lista!");
-    } catch (e: any) {
-      toast.error(e.message || "Erro ao entrar na lista");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Erro ao entrar na lista");
     }
   };
 

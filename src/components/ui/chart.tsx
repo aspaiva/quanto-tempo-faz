@@ -74,8 +74,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    const color = sanitizeCssColor(itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color);
+    const cssKey = sanitizeCssVariableName(key);
+    return color && cssKey ? `  --color-${cssKey}: ${color};` : null;
   })
   .join("\n")}
 }
@@ -86,6 +87,19 @@ ${colorConfig
     />
   );
 };
+
+function sanitizeCssVariableName(value: string) {
+  return /^[a-zA-Z0-9_-]+$/.test(value) ? value : "";
+}
+
+function sanitizeCssColor(value?: string) {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (/^#[0-9a-fA-F]{3,8}$/.test(trimmed)) return trimmed;
+  if (/^hsl\(\s*var\(--[a-zA-Z0-9_-]+\)\s*\)$/.test(trimmed)) return trimmed;
+  if (/^var\(--[a-zA-Z0-9_-]+\)$/.test(trimmed)) return trimmed;
+  return "";
+}
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 

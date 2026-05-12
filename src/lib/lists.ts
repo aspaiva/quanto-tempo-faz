@@ -9,6 +9,8 @@ export interface EventList {
   event_count?: number;
 }
 
+type ListRow = Omit<EventList, "is_owner" | "event_count">;
+
 export async function loadLists(): Promise<EventList[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Não autenticado");
@@ -28,7 +30,7 @@ export async function loadLists(): Promise<EventList[]> {
     .eq("user_id", user.id);
   if (e2) throw e2;
 
-  let sharedLists: any[] = [];
+  let sharedLists: ListRow[] = [];
   if (memberships && memberships.length > 0) {
     const ids = memberships.map((m) => m.list_id);
     const { data, error } = await supabase
@@ -42,7 +44,7 @@ export async function loadLists(): Promise<EventList[]> {
 
   // Get event counts
   const allIds = [...(ownLists || []), ...sharedLists].map((l) => l.id);
-  let countMap: Record<string, number> = {};
+  const countMap: Record<string, number> = {};
   if (allIds.length > 0) {
     const { data: listEvents } = await supabase
       .from("list_events")

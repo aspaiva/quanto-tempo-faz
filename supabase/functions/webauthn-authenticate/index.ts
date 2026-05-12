@@ -20,6 +20,7 @@ function getRpInfo(req: Request) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Método não permitido" }, 405);
 
   try {
     const adminClient = createClient(
