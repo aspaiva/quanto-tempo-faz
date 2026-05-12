@@ -8,18 +8,19 @@ Deno.serve(async (req) => {
     const error = url.searchParams.get("error");
 
     if (error) {
-      return new Response(`<html><body><script>window.close();</script>Autorização negada.</body></html>`, {
-        headers: { "Content-Type": "text/html" },
-      });
+      return htmlPage("Autorização negada.", true);
     }
 
     if (!code || !stateParam) {
       return new Response("Parâmetros inválidos", { status: 400 });
     }
 
-    const state = JSON.parse(atob(stateParam));
-    const userId = state.userId;
-    const redirectUrl = state.redirectUrl || "";
+    const parsed = await verifyState(stateParam);
+    if (!parsed) {
+      return new Response("Estado inválido", { status: 400 });
+    }
+    const userId: string = parsed.userId;
+    const redirectUrl: string = sanitizeRedirect(parsed.redirectUrl);
 
     const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
     const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET")!;
@@ -42,9 +43,8 @@ Deno.serve(async (req) => {
     const tokens = await tokenRes.json();
 
     if (!tokenRes.ok) {
-      return new Response(`<html><body>Erro ao obter token: ${tokens.error_description || tokens.error}</body></html>`, {
-        headers: { "Content-Type": "text/html" },
-      });
+      console.error("google-calendar-callback token error", tokens);
+      return htmlPage("Erro ao obter token do Google.", false);
     }
 
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -63,20 +63,103 @@ Deno.serve(async (req) => {
       }, { onConflict: "user_id" });
 
     if (dbError) {
-      return new Response(`<html><body>Erro ao salvar token: ${dbError.message}</body></html>`, {
-        headers: { "Content-Type": "text/html" },
-      });
+      console.error("google-calendar-callback db error", dbError);
+      return htmlPage("Erro ao salvar conexão.", false);
     }
 
-    // Redirect back or close window
-    const html = redirectUrl
-      ? `<html><body><script>window.location.href="${redirectUrl}?gcal=connected";</script></body></html>`
-      : `<html><body><script>if(window.opener){window.opener.postMessage("gcal-connected","*");window.close();}else{document.body.innerText="Google Calendar conectado! Pode fechar esta aba.";}</script></body></html>`;
-
-    return new Response(html, { headers: { "Content-Type": "text/html" } });
+    if (redirectUrl) {
+      const target = new URL(redirectUrl);
+      target.searchParams.set("gcal", "connected");
+      return Response.redirect(target.toString(), 302);
+    }
+    // Popup flow: postMessage to opener, then close. Static HTML, no interpolation.
+    const html = `<!doctype html><html><body><script>
+if(window.opener){window.opener.postMessage("gcal-connected","*");window.close();}
+else{document.body.innerText="Google Calendar conectado! Pode fechar esta aba.";}
+</script></body></html>`;
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
   } catch (error) {
-    return new Response(`<html><body>Erro: ${(error as Error).message}</body></html>`, {
-      headers: { "Content-Type": "text/html" },
-    });
+    console.error("google-calendar-callback error", error);
+    return new Response("Erro interno", { status: 500 });
   }
 });
+
+function htmlPage(message: string, closeWindow: boolean) {
+  // Static text only — message is hard-coded by us, never user input.
+  const safe = message.replace(/[<>&"']/g, (c) =>
+    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" } as Record<string, string>)[c]);
+  const close = closeWindow ? `<script>setTimeout(()=>window.close(),1500)</script>` : "";
+  return new Response(
+    `<!doctype html><html><body>${safe}${close}</body></html>`,
+    { headers: { "Content-Type": "text/html; charset=utf-8" } },
+  );
+}
+
+function sanitizeRedirect(url: unknown): string {
+  if (typeof url !== "string" || !url) return "";
+  try {
+    const u = new URL(url);
+    const host = u.hostname;
+    const ok =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host.endsWith(".lovable.app") ||
+      host.endsWith(".lovable.dev") ||
+      host.endsWith(".lovableproject.com");
+    if (!ok) return "";
+    if (u.protocol !== "https:" && u.protocol !== "http:") return "";
+    return u.toString();
+  } catch {
+    return "";
+  }
+}
+
+function b64urlDecode(s: string): string {
+  s = s.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  return atob(s);
+}
+
+function b64url(s: string): string {
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function hmac(message: string): Promise<string> {
+  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
+  return b64url(String.fromCharCode(...new Uint8Array(sig)));
+}
+
+async function verifyState(state: string): Promise<{ userId: string; redirectUrl: string } | null> {
+  const parts = state.split(".");
+  if (parts.length !== 2) return null;
+  const [payloadB64, sig] = parts;
+  let payload: string;
+  try {
+    payload = b64urlDecode(payloadB64);
+  } catch {
+    return null;
+  }
+  const expected = await hmac(payload);
+  // constant-time compare
+  if (sig.length !== expected.length) return null;
+  let diff = 0;
+  for (let i = 0; i < sig.length; i++) diff |= sig.charCodeAt(i) ^ expected.charCodeAt(i);
+  if (diff !== 0) return null;
+  try {
+    const obj = JSON.parse(payload);
+    // 10-minute TTL
+    if (typeof obj.iat === "number" && Date.now() - obj.iat > 10 * 60 * 1000) return null;
+    if (typeof obj.userId !== "string") return null;
+    return { userId: obj.userId, redirectUrl: typeof obj.redirectUrl === "string" ? obj.redirectUrl : "" };
+  } catch {
+    return null;
+  }
+}

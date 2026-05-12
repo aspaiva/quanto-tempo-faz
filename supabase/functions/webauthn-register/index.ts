@@ -139,14 +139,17 @@ Deno.serve(async (req) => {
         .delete()
         .eq("challenge", challenge);
 
-      if (insertRes.error) return json({ error: insertRes.error.message }, 400);
+      if (insertRes.error) {
+        console.error("webauthn-register insert error", insertRes.error);
+        return json({ error: "Não foi possível salvar o dispositivo" }, 400);
+      }
       return json({ verified: true });
     }
 
     return json({ error: "Ação inválida" }, 400);
   } catch (e) {
     console.error("webauthn-register error", e);
-    return json({ error: (e as Error).message ?? "Erro interno" }, 500);
+    return json({ error: "Erro interno" }, 500);
   }
 });
 
