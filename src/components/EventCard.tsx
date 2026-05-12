@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DateEvent, calculateTimeSince, totalDays, isFutureEvent } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
-import { Pencil, Trash2, Calendar, Download, CalendarPlus, Clock } from "lucide-react";
+import { Pencil, Trash2, Calendar, Download, CalendarPlus, Clock, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -25,55 +25,71 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
   return (
     <>
       <Card
-        className="group relative overflow-hidden border-border/60 p-5 transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+        className="group relative overflow-hidden border-border/70 bg-card p-0 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]"
         style={{
-          boxShadow: "var(--shadow-card)",
           backgroundColor: future ? "hsl(var(--countdown-card))" : undefined,
           borderColor: future ? "hsl(var(--countdown-border))" : undefined,
         }}
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {future && <Clock className="mr-1 inline h-3 w-3" />}
-              {event.category}
-            </p>
-            <h3 className="mt-1 truncate font-display text-lg font-semibold text-foreground">{event.label}</h3>
-            <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
-              <span>{formattedDate}</span>
+        <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
+        <div className="p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-secondary-foreground">
+                  {event.category}
+                </span>
+                {future && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-accent/12 px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-accent">
+                    <Clock className="h-3 w-3" />
+                    Futuro
+                  </span>
+                )}
+              </div>
+              <h3 className="mt-3 line-clamp-2 font-display text-xl font-extrabold leading-tight text-foreground">{event.label}</h3>
+              <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{formattedDate}</span>
+              </div>
             </div>
+            {!hideActions && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onEdit(event)}>
+                    <Pencil className="mr-2 h-4 w-4" /> Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onDelete(event.id)} className="text-destructive focus:text-destructive">
+                    <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-          {!hideActions && (
-            <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(event)}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            <TimeBlock value={years} label={years === 1 ? "ano" : "anos"} future={future} />
+            <TimeBlock value={months} label={months === 1 ? "mês" : "meses"} future={future} />
+            <TimeBlock value={days} label={days === 1 ? "dia" : "dias"} future={future} />
+          </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          <TimeBlock value={years} label={years === 1 ? "ano" : "anos"} future={future} />
-          <TimeBlock value={months} label={months === 1 ? "mês" : "meses"} future={future} />
-          <TimeBlock value={days} label={days === 1 ? "dia" : "dias"} future={future} />
-        </div>
-
-        <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center justify-between border-t border-border/70 bg-muted/35 px-5 py-3">
           <p className="text-sm text-muted-foreground">
-            {future ? "Faltam" : "Total"}: <span className="font-semibold text-foreground">{total.toLocaleString("pt-BR")}</span> dias
+            {future ? "Faltam" : "Total"} <span className="font-semibold text-foreground">{total.toLocaleString("pt-BR")}</span> dias
           </p>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
-              <CalendarPlus className="h-3.5 w-3.5" />
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
+              <CalendarPlus className="h-4 w-4" />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7" title="Exportar .ics">
-                  <Download className="h-3.5 w-3.5" />
+                <Button variant="ghost" size="icon" className="h-8 w-8" title="Exportar .ics">
+                  <Download className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -91,22 +107,22 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
 
 function TimeBlock({ value, label, future }: { value: number; label: string; future?: boolean }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col gap-1">
       <div
-        className="flex h-16 w-full items-center justify-center rounded-xl border shadow-sm"
+        className="flex h-16 items-center justify-center rounded-md border bg-secondary/70"
         style={{
-          backgroundColor: future ? "hsl(var(--countdown-border) / 0.25)" : "hsl(var(--secondary))",
-          borderColor: future ? "hsl(var(--countdown-border) / 0.5)" : "hsl(var(--border))",
+          backgroundColor: future ? "hsl(var(--countdown-border) / 0.28)" : undefined,
+          borderColor: future ? "hsl(var(--countdown-border) / 0.55)" : undefined,
         }}
       >
         <span
-          className="font-display text-3xl font-extrabold tabular-nums"
+          className="font-display text-3xl font-extrabold tabular-nums leading-none"
           style={{ color: future ? "hsl(var(--countdown-primary))" : "hsl(var(--primary))" }}
         >
           {value}
         </span>
       </div>
-      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-center text-[11px] font-semibold uppercase text-muted-foreground">{label}</span>
     </div>
   );
 }

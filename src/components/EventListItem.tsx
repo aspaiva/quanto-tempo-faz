@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { DateEvent, calculateTimeSince, totalDays } from "@/lib/events";
+import { DateEvent, calculateTimeSince, totalDays, isFutureEvent } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
-import { Pencil, Trash2, Download, CalendarPlus } from "lucide-react";
+import { Pencil, Trash2, Download, CalendarPlus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { downloadICS } from "@/lib/ics";
@@ -19,35 +19,48 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
   const total = totalDays(event.date);
   const formattedDate = parseLocalDate(event.date).toLocaleDateString("pt-BR");
   const [gcalOpen, setGcalOpen] = useState(false);
+  const future = isFutureEvent(event.date);
 
   return (
     <>
-      <div className="group flex items-center gap-4 rounded-lg border border-border/60 bg-card px-4 py-3 transition-shadow hover:shadow-sm">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate font-display text-sm font-semibold text-foreground">{event.label}</span>
-            <span className="shrink-0 rounded-full bg-secondary/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+      <div
+        className="group grid gap-3 rounded-lg border border-border/70 bg-card px-4 py-3 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center"
+        style={{
+          backgroundColor: future ? "hsl(var(--countdown-card))" : undefined,
+          borderColor: future ? "hsl(var(--countdown-border))" : undefined,
+        }}
+      >
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="truncate font-display text-base font-bold text-foreground">{event.label}</span>
+            <span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-secondary-foreground">
               {event.category}
             </span>
+            {future && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent/12 px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-accent">
+                <Clock className="h-3 w-3" />
+                Futuro
+              </span>
+            )}
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">{formattedDate}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{formattedDate}</p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3 text-sm">
-          <span className="font-display font-bold text-primary">{years}<span className="ml-0.5 text-xs font-normal text-muted-foreground">a</span></span>
-          <span className="font-display font-bold text-primary">{months}<span className="ml-0.5 text-xs font-normal text-muted-foreground">m</span></span>
-          <span className="font-display font-bold text-primary">{days}<span className="ml-0.5 text-xs font-normal text-muted-foreground">d</span></span>
-          <span className="text-xs text-muted-foreground">({total.toLocaleString("pt-BR")}d)</span>
+        <div className="grid grid-cols-4 gap-2 text-center text-sm sm:w-[260px]">
+          <CompactTime value={years} label="a" />
+          <CompactTime value={months} label="m" />
+          <CompactTime value={days} label="d" />
+          <CompactTime value={total} label="total" />
         </div>
 
-        <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
-            <CalendarPlus className="h-3.5 w-3.5" />
+        <div className="flex items-center justify-end gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
+            <CalendarPlus className="h-4 w-4" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7" title="Exportar .ics">
-                <Download className="h-3.5 w-3.5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8" title="Exportar .ics">
+                <Download className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -55,20 +68,29 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
               <DropdownMenuItem onClick={() => downloadICS(event, "yearly")}>Repetir anualmente</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
 
-        {!hideActions && (
-          <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(event)}>
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        )}
+          {!hideActions && (
+            <>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(event)} title="Editar">
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)} title="Excluir">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
       <GoogleCalendarDialog open={gcalOpen} onOpenChange={setGcalOpen} events={[event]} mode="single" />
     </>
+  );
+}
+
+function CompactTime({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="rounded-md bg-secondary/70 px-2 py-1.5">
+      <span className="block font-display text-base font-extrabold leading-none text-primary tabular-nums">{value.toLocaleString("pt-BR")}</span>
+      <span className="mt-0.5 block text-[10px] font-semibold uppercase leading-none text-muted-foreground">{label}</span>
+    </div>
   );
 }

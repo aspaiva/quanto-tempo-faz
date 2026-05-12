@@ -10,45 +10,45 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 35 30% 96%;
-    --foreground: 25 30% 12%;
+    --background: 210 33% 97%;
+    --foreground: 222 45% 12%;
 
-    --card: 35 40% 98%;
-    --card-foreground: 25 30% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 45% 12%;
 
-    --popover: 35 40% 98%;
-    --popover-foreground: 25 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 45% 12%;
 
-    --primary: 25 65% 45%;
-    --primary-foreground: 35 40% 98%;
+    --primary: 199 84% 35%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 25% 90%;
-    --secondary-foreground: 25 30% 20%;
+    --secondary: 203 38% 92%;
+    --secondary-foreground: 215 40% 18%;
 
-    --muted: 35 20% 92%;
-    --muted-foreground: 25 15% 50%;
+    --muted: 210 24% 93%;
+    --muted-foreground: 215 16% 44%;
 
-    --accent: 15 70% 55%;
-    --accent-foreground: 35 40% 98%;
+    --accent: 156 50% 42%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 20% 85%;
-    --input: 30 20% 85%;
-    --ring: 25 65% 45%;
+    --border: 212 22% 85%;
+    --input: 212 22% 85%;
+    --ring: 199 84% 35%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --font-display: 'Raleway', sans-serif;
     --font-body: 'DM Sans', sans-serif;
 
-    --shadow-card: 0 2px 12px -2px hsl(25 30% 12% / 0.08);
-    --shadow-card-hover: 0 8px 24px -4px hsl(25 30% 12% / 0.12);
+    --shadow-card: 0 10px 30px -24px hsl(222 45% 12% / 0.55);
+    --shadow-card-hover: 0 22px 44px -30px hsl(222 45% 12% / 0.6);
 
-    --countdown-card: 210 60% 96%;
-    --countdown-primary: 210 65% 45%;
-    --countdown-border: 210 40% 80%;
+    --countdown-card: 194 70% 95%;
+    --countdown-primary: 188 78% 31%;
+    --countdown-border: 188 44% 76%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

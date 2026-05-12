@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X, ShieldCheck } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X, ShieldCheck, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
@@ -31,19 +31,20 @@ const Index = () => {
   }, [events]);
 
   const filteredAndSortedEvents = useMemo(() => {
-    let filtered = selectedCategory
+    const filtered = selectedCategory
       ? events.filter((e) => e.category === selectedCategory)
       : events;
     const now = Date.now();
-    const sorted = [...filtered].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const aFuture = new Date(a.date).getTime() > now ? 0 : 1;
       const bFuture = new Date(b.date).getTime() > now ? 0 : 1;
       if (aFuture !== bFuture) return aFuture - bFuture;
       const diff = totalDays(a.date) - totalDays(b.date);
       return sortOrder === "farthest" ? -diff : diff;
     });
-    return sorted;
   }, [events, sortOrder, selectedCategory]);
+
+  const nextEvent = filteredAndSortedEvents[0];
 
   useEffect(() => {
     loadEvents()
@@ -90,28 +91,34 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-body">
-      <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <Clock className="h-6 w-6 text-primary" />
-            <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">Quanto tempo faz</h1>
+    <div className="min-h-screen bg-background font-body text-foreground">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(199_84%_35%_/_0.16),transparent_34%),linear-gradient(180deg,hsl(210_33%_97%),hsl(203_38%_92%))]" />
+      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate font-display text-lg font-bold text-foreground sm:text-2xl">Quanto tempo faz</h1>
+              <p className="hidden text-xs text-muted-foreground sm:block">Datas importantes, tempo decorrido e próximos marcos.</p>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
-            <div className="flex rounded-md border border-border">
+          <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+            <div className="flex rounded-md border border-border bg-card p-0.5 shadow-sm">
               <Button
-                variant={viewMode === "cards" ? "secondary" : "ghost"}
+                variant={viewMode === "cards" ? "default" : "ghost"}
                 size="icon"
-                className="h-8 w-8 rounded-r-none"
+                className="h-8 w-8"
                 onClick={() => setViewMode("cards")}
                 title="Cartões"
               >
                 <LayoutGrid className="h-4 w-4" />
               </Button>
               <Button
-                variant={viewMode === "list" ? "secondary" : "ghost"}
+                variant={viewMode === "list" ? "default" : "ghost"}
                 size="icon"
-                className="h-8 w-8 rounded-l-none"
+                className="h-8 w-8"
                 onClick={() => setViewMode("list")}
                 title="Lista"
               >
@@ -119,10 +126,10 @@ const Index = () => {
               </Button>
             </div>
             <Button
-              onClick={() => setSortOrder(s => s === "closest" ? "farthest" : "closest")}
+              onClick={() => setSortOrder((s) => s === "closest" ? "farthest" : "closest")}
               variant="outline"
               size="sm"
-              className="gap-1.5"
+              className="gap-1.5 bg-card shadow-sm"
               title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
             >
               <ArrowUpDown className="h-4 w-4" />
@@ -133,7 +140,7 @@ const Index = () => {
                 <Button
                   variant={selectedCategory ? "secondary" : "outline"}
                   size="sm"
-                  className="gap-1.5"
+                  className="gap-1.5 bg-card shadow-sm"
                   title="Filtrar por categoria"
                 >
                   <Filter className="h-4 w-4" />
@@ -160,10 +167,10 @@ const Index = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5">
+            <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5 bg-card shadow-sm">
               <FolderOpen className="h-4 w-4" /> <span className="hidden sm:inline">Listas</span>
             </Button>
-            <Button onClick={handleOpenNew} size="sm" className="gap-1.5">
+            <Button onClick={handleOpenNew} size="sm" className="gap-1.5 shadow-sm">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo evento</span>
             </Button>
             <Button onClick={() => navigate("/settings/security")} variant="ghost" size="icon" className="h-9 w-9" title="Segurança">
@@ -176,7 +183,32 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+        <section className="mb-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-border/70 bg-card/85 p-4 shadow-[var(--shadow-card)] backdrop-blur">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Eventos</p>
+            <p className="mt-1 font-display text-3xl font-extrabold tabular-nums">{events.length}</p>
+          </div>
+          <div className="rounded-lg border border-border/70 bg-card/85 p-4 shadow-[var(--shadow-card)] backdrop-blur sm:col-span-2">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/15 text-accent">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase text-muted-foreground">Em foco</p>
+                <p className="mt-1 truncate font-display text-xl font-bold">
+                  {nextEvent ? nextEvent.label : "Sem eventos para destacar"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {nextEvent
+                    ? `${totalDays(nextEvent.date).toLocaleString("pt-BR")} dias ${new Date(nextEvent.date).getTime() > Date.now() ? "até a data" : "desde a data"}`
+                    : "Crie um evento para começar o acompanhamento."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {selectedCategory && (
           <div className="mb-4 flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Filtrando por:</span>
@@ -190,7 +222,7 @@ const Index = () => {
             <p className="text-muted-foreground">Carregando...</p>
           </div>
         ) : events.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/75 px-6 py-20 text-center">
             <div className="mb-4 rounded-full bg-secondary p-5">
               <Clock className="h-10 w-10 text-muted-foreground" />
             </div>
@@ -203,7 +235,7 @@ const Index = () => {
             </Button>
           </div>
         ) : filteredAndSortedEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/75 px-6 py-20 text-center">
             <p className="text-muted-foreground">Nenhum evento encontrado para "{selectedCategory}"</p>
             <Button variant="outline" onClick={() => setSelectedCategory(null)} className="mt-4 gap-1.5">
               <X className="h-4 w-4" /> Limpar filtro
@@ -211,7 +243,7 @@ const Index = () => {
           </div>
         ) : (
           viewMode === "cards" ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredAndSortedEvents.map((event) => (
                 <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
               ))}
