@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
     return json({ error: "Ação inválida" }, 400);
   } catch (e) {
     console.error("webauthn-register error", e);
-    return json({ error: (e as Error).message ?? "Erro interno" }, 500);
+    return json({ error: "Erro interno" }, 500);
   }
 });
 
