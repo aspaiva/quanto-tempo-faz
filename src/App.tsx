@@ -48,7 +48,6 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <main>
           <Routes>
             <Route path="/auth" element={session ? <RedirectAfterAuth /> : <Auth />} />
             <Route path="/" element={<RequireAuth session={session}><Index /></RequireAuth>} />
@@ -58,7 +57,6 @@ const App = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          </main>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
