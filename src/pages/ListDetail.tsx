@@ -13,6 +13,7 @@ import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists"
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
+import { SEO } from "@/components/SEO";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -183,6 +184,12 @@ const ListDetail = () => {
 
   return (
     <div className="min-h-screen bg-background font-body">
+      <SEO
+        title={`${listName || "Lista"} — Quanto tempo?`}
+        description="Eventos de uma lista compartilhada no Quanto tempo?."
+        path="/lists"
+        noindex
+      />
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
