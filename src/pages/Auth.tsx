@@ -9,6 +9,7 @@ import { CalendarDays, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { BiometricLoginButton } from "@/components/BiometricLoginButton";
 import { useBiometricAuth, getHasPasskeyHint } from "@/hooks/useBiometricAuth";
+import { SEO } from "@/components/SEO";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -50,6 +51,11 @@ const Auth = () => {
     <div className="min-h-screen bg-background font-body text-foreground">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_20%_18%,hsl(199_84%_35%_/_0.18),transparent_30%),radial-gradient(circle_at_84%_74%,hsl(156_50%_42%_/_0.14),transparent_28%),linear-gradient(180deg,hsl(210_33%_97%),hsl(203_38%_92%))]" />
       <main className="relative grid min-h-screen items-center gap-8 px-4 py-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:px-12">
+        <SEO
+          title="Entrar ou criar conta — Quanto tempo?"
+          description="Acesse o Quanto tempo? para acompanhar datas importantes, marcos pessoais e contagens com login por e-mail ou biometria."
+          path="/auth"
+        />
         <section className="mx-auto hidden max-w-2xl lg:block">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-sm font-medium text-muted-foreground shadow-sm backdrop-blur">
             <Sparkles className="h-4 w-4 text-accent" />

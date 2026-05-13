@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { SEO } from "@/components/SEO";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -53,7 +54,8 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 font-body">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 font-body">
+      <SEO title="Redefinir senha — Quanto tempo?" description="Crie uma nova senha para sua conta no Quanto tempo?." path="/reset-password" noindex />
       <Card className="w-full max-w-sm border-border/60 p-6">
         <div className="mb-6 flex flex-col items-center gap-2">
           <CalendarDays className="h-10 w-10 text-primary" strokeWidth={1.5} />
@@ -74,7 +76,7 @@ const ResetPassword = () => {
           <p className="text-center text-sm text-muted-foreground">Verificando link de recuperação...</p>
         )}
       </Card>
-    </div>
+    </main>
   );
 };
 
