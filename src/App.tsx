@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-route
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import Index from "./pages/Index";
@@ -16,6 +17,27 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function AppShellMessage({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 font-body text-foreground">
+      <div className="w-full max-w-sm text-center">
+        <div className="mx-auto mb-5 h-10 w-10 animate-pulse rounded-md bg-primary" />
+        <h1 className="font-display text-2xl font-bold">{title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+        {action ? <div className="mt-6">{action}</div> : null}
+      </div>
+    </div>
+  );
+}
+
 function RequireAuth({ children, session }: { children: React.ReactNode; session: Session | null }) {
   const location = useLocation();
   if (!session) {
@@ -27,20 +49,44 @@ function RequireAuth({ children, session }: { children: React.ReactNode; session
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setAuthError(null);
       setLoading(false);
     });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          setAuthError(error.message);
+        } else {
+          setSession(session);
+          setAuthError(null);
+        }
+      })
+      .catch((error) => {
+        setAuthError(error instanceof Error ? error.message : "Falha ao iniciar a autenticação.");
+      })
+      .finally(() => setLoading(false));
     return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) return null;
+  if (loading) {
+    return <AppShellMessage title="Quanto tempo?" description="Carregando suas datas importantes..." />;
+  }
+
+  if (authError) {
+    return (
+      <AppShellMessage
+        title="Não foi possível abrir o app"
+        description={`Erro de autenticação: ${authError}`}
+        action={<Button onClick={() => window.location.reload()}>Tentar novamente</Button>}
+      />
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
