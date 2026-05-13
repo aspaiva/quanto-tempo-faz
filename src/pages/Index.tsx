@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { BiometricPostLoginPrompt } from "@/components/BiometricPostLoginPrompt";
+import { SEO } from "@/components/SEO";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -92,6 +93,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background font-body text-foreground">
+      <SEO
+        title="Quanto tempo? — Acompanhe suas datas importantes"
+        description="Veja quanto tempo faz e quanto falta para aniversários, marcos pessoais e compromissos em uma única tela."
+        path="/"
+      />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(199_84%_35%_/_0.16),transparent_34%),linear-gradient(180deg,hsl(210_33%_97%),hsl(203_38%_92%))]" />
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">

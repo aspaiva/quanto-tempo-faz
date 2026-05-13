@@ -1,0 +1,13 @@
+# Quanto tempo?
+
+> Aplicativo para calcular quanto tempo faz ou quanto falta para datas importantes — aniversários, marcos pessoais e compromissos.
+
+## Pages
+
+- [Início](/): Visão geral dos seus eventos com tempo decorrido e contagem regressiva.
+- [Entrar](/auth): Acesse com e-mail/senha ou biometria (Face ID, Touch ID, Windows Hello).
+
+## Optional
+
+- [Listas](/lists): Organize eventos em listas compartilháveis.
+- [Segurança](/settings/security): Gerencie dispositivos com biometria.

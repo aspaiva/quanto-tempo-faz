@@ -7,6 +7,7 @@ import { EventList, loadLists, createList, updateList, deleteList, joinListById 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { SEO } from "@/components/SEO";
 
 const Lists = () => {
   const [lists, setLists] = useState<EventList[]>([]);
@@ -94,6 +95,11 @@ const Lists = () => {
 
   return (
     <div className="min-h-screen bg-background font-body">
+      <SEO
+        title="Minhas listas — Quanto tempo?"
+        description="Organize seus eventos em listas compartilháveis e acompanhe datas importantes com quem você quiser."
+        path="/lists"
+      />
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <div className="flex items-center gap-2.5 min-w-0">

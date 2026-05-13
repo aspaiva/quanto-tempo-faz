@@ -2,10 +2,17 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DeviceManager } from "@/components/DeviceManager";
+import { SEO } from "@/components/SEO";
 
 const SecuritySettings = () => {
   return (
-    <div className="min-h-screen bg-background font-body">
+    <main className="min-h-screen bg-background font-body">
+      <SEO
+        title="Segurança e dispositivos — Quanto tempo?"
+        description="Gerencie dispositivos com biometria, Face ID e Touch ID associados à sua conta no Quanto tempo?."
+        path="/settings/security"
+        noindex
+      />
       <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="mb-6 flex items-center gap-2">
           <Button asChild variant="ghost" size="icon">
@@ -17,7 +24,7 @@ const SecuritySettings = () => {
         </div>
         <DeviceManager />
       </div>
-    </div>
+    </main>
   );
 };
 
