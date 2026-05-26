@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DeviceManager } from "@/components/DeviceManager";
 import { SEO } from "@/components/SEO";
+import { HelpButton } from "@/features/help/HelpButton";
 
 const SecuritySettings = () => {
   return (
@@ -21,6 +22,9 @@ const SecuritySettings = () => {
             </Link>
           </Button>
           <h1 className="font-display text-2xl font-bold">Segurança</h1>
+          <div className="ml-auto">
+            <HelpButton />
+          </div>
         </div>
         <DeviceManager />
       </div>

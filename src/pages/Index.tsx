@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from "@/components/ui/badge";
 import { BiometricPostLoginPrompt } from "@/components/BiometricPostLoginPrompt";
 import { SEO } from "@/components/SEO";
+import { HelpButton } from "@/features/help/HelpButton";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -182,6 +183,7 @@ const Index = () => {
             <Button onClick={() => navigate("/settings/security")} variant="ghost" size="icon" className="h-9 w-9" title="Segurança">
               <ShieldCheck className="h-4 w-4" />
             </Button>
+            <HelpButton />
             <Button onClick={handleLogout} variant="ghost" size="icon" className="h-9 w-9" title="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
