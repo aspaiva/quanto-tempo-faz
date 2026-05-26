@@ -4,6 +4,7 @@ import { parseLocalDate } from "@/lib/utils";
 import { Pencil, Trash2, Download, CalendarPlus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { downloadICS } from "@/lib/ics";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 
@@ -19,6 +20,7 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
   const total = totalDays(event.date);
   const formattedDate = parseLocalDate(event.date).toLocaleDateString("pt-BR");
   const [gcalOpen, setGcalOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const future = isFutureEvent(event.date);
 
   return (
@@ -74,7 +76,7 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(event)} title="Editar">
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(event.id)} title="Excluir">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setConfirmDelete(true)} title="Excluir">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </>
@@ -82,6 +84,28 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
         </div>
       </div>
       <GoogleCalendarDialog open={gcalOpen} onOpenChange={setGcalOpen} events={[event]} mode="single" />
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent className="font-body">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">Excluir evento?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir "{event.label}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                onDelete(event.id);
+                setConfirmDelete(false);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
