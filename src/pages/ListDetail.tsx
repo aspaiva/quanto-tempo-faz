@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 import { SEO } from "@/components/SEO";
+import { HelpButton } from "@/features/help/HelpButton";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -235,6 +236,7 @@ const ListDetail = () => {
             <Button onClick={() => setAddOpen(true)} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Adicionar evento</span>
             </Button>
+            <HelpButton />
           </div>
         </div>
       </header>

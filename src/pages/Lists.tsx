@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
+import { HelpButton } from "@/features/help/HelpButton";
 
 const Lists = () => {
   const [lists, setLists] = useState<EventList[]>([]);
@@ -116,6 +117,7 @@ const Lists = () => {
             <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nova lista</span>
             </Button>
+            <HelpButton />
             <Button onClick={handleLogout} variant="ghost" size="icon" className="h-9 w-9" title="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
