@@ -50,6 +50,11 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
                     Futuro
                   </span>
                 )}
+                {recurring && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-primary">
+                    Anual
+                  </span>
+                )}
               </div>
               <h3 className="mt-3 line-clamp-2 font-display text-xl font-extrabold leading-tight text-foreground">{event.label}</h3>
               <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
