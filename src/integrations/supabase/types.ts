@@ -19,6 +19,7 @@ export type Database = {
           category: string
           created_at: string
           date: string
+          favorite: boolean
           id: string
           label: string
           recurring: boolean
@@ -28,6 +29,7 @@ export type Database = {
           category: string
           created_at?: string
           date: string
+          favorite?: boolean
           id?: string
           label: string
           recurring?: boolean
@@ -37,6 +39,7 @@ export type Database = {
           category?: string
           created_at?: string
           date?: string
+          favorite?: boolean
           id?: string
           label?: string
           recurring?: boolean
