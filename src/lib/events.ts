@@ -7,6 +7,7 @@ export interface DateEvent {
   category: string;
   date: string; // ISO string
   recurring?: boolean;
+  favorite?: boolean;
 }
 
 export const EVENT_CATEGORIES = [
@@ -86,11 +87,11 @@ export async function loadEvents(): Promise<DateEvent[]> {
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, label, category, date, recurring")
+    .select("id, label, category, date, recurring, favorite")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data || []).map((e) => ({ ...e, date: e.date, recurring: !!e.recurring }));
+  return (data || []).map((e) => ({ ...e, date: e.date, recurring: !!e.recurring, favorite: !!e.favorite }));
 }
 
 export async function saveEvent(event: Omit<DateEvent, "id"> & { id?: string }): Promise<DateEvent> {
@@ -100,17 +101,17 @@ export async function saveEvent(event: Omit<DateEvent, "id"> & { id?: string }):
   if (event.id) {
     const { data, error } = await supabase
       .from("events")
-      .update({ label: event.label, category: event.category, date: event.date, recurring: !!event.recurring })
+      .update({ label: event.label, category: event.category, date: event.date, recurring: !!event.recurring, favorite: !!event.favorite })
       .eq("id", event.id)
-      .select("id, label, category, date, recurring")
+      .select("id, label, category, date, recurring, favorite")
       .single();
     if (error) throw error;
     return data;
   } else {
     const { data, error } = await supabase
       .from("events")
-      .insert({ label: event.label, category: event.category, date: event.date, recurring: !!event.recurring, user_id: user.id })
-      .select("id, label, category, date, recurring")
+      .insert({ label: event.label, category: event.category, date: event.date, recurring: !!event.recurring, favorite: !!event.favorite, user_id: user.id })
+      .select("id, label, category, date, recurring, favorite")
       .single();
     if (error) throw error;
     return data;
@@ -119,5 +120,10 @@ export async function saveEvent(event: Omit<DateEvent, "id"> & { id?: string }):
 
 export async function deleteEvent(id: string): Promise<void> {
   const { error } = await supabase.from("events").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function setEventFavorite(id: string, favorite: boolean): Promise<void> {
+  const { error } = await supabase.from("events").update({ favorite }).eq("id", id);
   if (error) throw error;
 }
