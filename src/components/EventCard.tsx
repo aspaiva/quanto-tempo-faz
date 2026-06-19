@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DateEvent, calculateTimeSince, totalDays, isFutureEvent } from "@/lib/events";
+import { DateEvent, calculateTimeSince, totalDays, isFutureEvent, daysUntilNextOccurrence } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
 import { Pencil, Trash2, Calendar, Download, CalendarPlus, Clock, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,9 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
   const [gcalOpen, setGcalOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const future = isFutureEvent(event.date);
+  const recurring = !!event.recurring;
+  const showNextOccurrence = recurring && !future;
+  const daysToNext = showNextOccurrence ? daysUntilNextOccurrence(event.date) : 0;
 
   return (
     <>
@@ -45,6 +48,11 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
                   <span className="inline-flex items-center gap-1 rounded-full bg-accent/12 px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-accent">
                     <Clock className="h-3 w-3" />
                     Futuro
+                  </span>
+                )}
+                {recurring && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-primary">
+                    Anual
                   </span>
                 )}
               </div>
@@ -81,9 +89,19 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
         </div>
 
         <div className="flex items-center justify-between border-t border-border/70 bg-muted/35 px-5 py-3">
-          <p className="text-sm text-muted-foreground">
-            {future ? "Faltam" : "Total"} <span className="font-semibold text-foreground">{total.toLocaleString("pt-BR")}</span> dias
-          </p>
+          <div className="flex flex-col text-sm text-muted-foreground">
+            <p>
+              {future ? "Faltam" : "Total"} <span className="font-semibold text-foreground">{total.toLocaleString("pt-BR")}</span> dias
+            </p>
+            {showNextOccurrence && (
+              <p className="mt-0.5 inline-flex items-center gap-1 text-xs" style={{ color: "hsl(var(--countdown-primary))" }}>
+                <Clock className="h-3 w-3" />
+                {daysToNext === 0
+                  ? "É hoje!"
+                  : <>Faltam <span className="font-semibold">{daysToNext.toLocaleString("pt-BR")}</span> dias para a próxima</>}
+              </p>
+            )}
+          </div>
           <div className="flex gap-1">
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
               <CalendarPlus className="h-4 w-4" />

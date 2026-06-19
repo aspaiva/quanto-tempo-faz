@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DateEvent, calculateTimeSince, totalDays, isFutureEvent } from "@/lib/events";
+import { DateEvent, calculateTimeSince, totalDays, isFutureEvent, daysUntilNextOccurrence } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
 import { Pencil, Trash2, Download, CalendarPlus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,9 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
   const [gcalOpen, setGcalOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const future = isFutureEvent(event.date);
+  const recurring = !!event.recurring;
+  const showNextOccurrence = recurring && !future;
+  const daysToNext = showNextOccurrence ? daysUntilNextOccurrence(event.date) : 0;
 
   return (
     <>
@@ -44,8 +47,20 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
                 Futuro
               </span>
             )}
+            {recurring && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase leading-none text-primary">
+                Anual
+              </span>
+            )}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">{formattedDate}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {formattedDate}
+            {showNextOccurrence && (
+              <span className="ml-2" style={{ color: "hsl(var(--countdown-primary))" }}>
+                · {daysToNext === 0 ? "É hoje!" : `Faltam ${daysToNext.toLocaleString("pt-BR")} dias`}
+              </span>
+            )}
+          </p>
         </div>
 
         <div className="grid grid-cols-4 gap-2 text-center text-sm sm:w-[260px]">
