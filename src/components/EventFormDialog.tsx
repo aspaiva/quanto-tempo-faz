@@ -169,6 +169,21 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
               )}
             </div>
 
+            <div className="flex items-start gap-2 rounded-md border border-border/70 bg-muted/30 p-3">
+              <Checkbox
+                id="recurring"
+                checked={recurring}
+                onCheckedChange={(v) => setRecurring(v === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-0.5">
+                <Label htmlFor="recurring" className="cursor-pointer">Data recorrente (anual)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Para aniversários, nascimentos e datas comemorativas. Mostra também a contagem regressiva para a próxima ocorrência.
+                </p>
+              </div>
+            </div>
+
             {/* Mini calendar picker */}
             {showPicker && (
               <div className="rounded-lg border border-border bg-card p-3 space-y-3">
