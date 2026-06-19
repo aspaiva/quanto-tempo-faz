@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DateEvent, calculateTimeSince, totalDays, isFutureEvent, daysUntilNextOccurrence } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
-import { Pencil, Trash2, Download, CalendarPlus, Clock } from "lucide-react";
+import { Pencil, Trash2, Download, CalendarPlus, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -12,10 +12,11 @@ interface EventListItemProps {
   event: DateEvent;
   onEdit: (event: DateEvent) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite?: (event: DateEvent) => void;
   hideActions?: boolean;
 }
 
-export function EventListItem({ event, onEdit, onDelete, hideActions }: EventListItemProps) {
+export function EventListItem({ event, onEdit, onDelete, onToggleFavorite, hideActions }: EventListItemProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
   const formattedDate = parseLocalDate(event.date).toLocaleDateString("pt-BR");
@@ -23,6 +24,7 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
   const [confirmDelete, setConfirmDelete] = useState(false);
   const future = isFutureEvent(event.date);
   const recurring = !!event.recurring;
+  const favorite = !!event.favorite;
   const showNextOccurrence = recurring && !future;
   const daysToNext = showNextOccurrence ? daysUntilNextOccurrence(event.date) : 0;
 
@@ -71,6 +73,24 @@ export function EventListItem({ event, onEdit, onDelete, hideActions }: EventLis
         </div>
 
         <div className="flex items-center justify-end gap-1">
+          {!hideActions && onToggleFavorite && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onToggleFavorite(event)}
+              title={favorite ? "Remover dos favoritos" : "Marcar como favorito"}
+              aria-pressed={favorite}
+            >
+              <Star
+                className="h-4 w-4"
+                style={{
+                  fill: favorite ? "hsl(var(--primary))" : "transparent",
+                  color: favorite ? "hsl(var(--primary))" : undefined,
+                }}
+              />
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setGcalOpen(true)} title="Adicionar ao Google Calendar">
             <CalendarPlus className="h-4 w-4" />
           </Button>
