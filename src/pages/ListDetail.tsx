@@ -102,7 +102,7 @@ const ListDetail = () => {
         if (eventIds.length > 0) {
           const { data: evts, error } = await supabase
             .from("events")
-            .select("id, label, category, date, user_id")
+            .select("id, label, category, date, recurring, user_id")
             .in("id", eventIds);
           if (error) throw error;
           setListEvents((evts || []) as ListEventWithOwner[]);
@@ -113,7 +113,7 @@ const ListDetail = () => {
         // Load user's own events for the "add" dialog
         const { data: myEvts, error: myErr } = await supabase
           .from("events")
-          .select("id, label, category, date")
+          .select("id, label, category, date, recurring")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
         if (myErr) throw myErr;
@@ -143,7 +143,7 @@ const ListDetail = () => {
       await addEventToList(id, saved.id);
       const { data: full } = await supabase
         .from("events")
-        .select("id, label, category, date, user_id")
+        .select("id, label, category, date, recurring, user_id")
         .eq("id", saved.id)
         .single();
       if (full) setListEvents((prev) => [...prev, full as ListEventWithOwner]);
@@ -160,7 +160,7 @@ const ListDetail = () => {
       // Reload the event data
       const { data } = await supabase
         .from("events")
-        .select("id, label, category, date, user_id")
+        .select("id, label, category, date, recurring, user_id")
         .eq("id", eventId)
         .single();
       if (data) setListEvents((prev) => [...prev, data as ListEventWithOwner]);
