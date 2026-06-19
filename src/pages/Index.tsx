@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
 import { EventFormDialog } from "@/components/EventFormDialog";
-import { DateEvent, loadEvents, saveEvent, deleteEvent, totalDays } from "@/lib/events";
+import { DateEvent, loadEvents, saveEvent, deleteEvent, totalDays, setEventFavorite } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -38,6 +38,10 @@ const Index = () => {
       : events;
     const now = Date.now();
     return [...filtered].sort((a, b) => {
+      // Favorites always first
+      const aFav = a.favorite ? 0 : 1;
+      const bFav = b.favorite ? 0 : 1;
+      if (aFav !== bFav) return aFav - bFav;
       const aFuture = new Date(a.date).getTime() > now ? 0 : 1;
       const bFuture = new Date(b.date).getTime() > now ? 0 : 1;
       if (aFuture !== bFuture) return aFuture - bFuture;
@@ -80,6 +84,17 @@ const Index = () => {
       setEvents((prev) => prev.filter((e) => e.id !== id));
     } catch {
       toast.error("Erro ao excluir evento");
+    }
+  };
+
+  const handleToggleFavorite = async (event: DateEvent) => {
+    const newValue = !event.favorite;
+    setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, favorite: newValue } : e)));
+    try {
+      await setEventFavorite(event.id, newValue);
+    } catch (err: any) {
+      setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, favorite: !newValue } : e)));
+      toast.error(`Erro ao atualizar favorito: ${err?.message ?? "tente novamente"}`);
     }
   };
 
@@ -253,13 +268,13 @@ const Index = () => {
           viewMode === "cards" ? (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredAndSortedEvents.map((event) => (
-                <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
+                <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} onToggleFavorite={handleToggleFavorite} />
               ))}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
               {filteredAndSortedEvents.map((event) => (
-                <EventListItem key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
+                <EventListItem key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} onToggleFavorite={handleToggleFavorite} />
               ))}
             </div>
           )

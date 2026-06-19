@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DateEvent, calculateTimeSince, totalDays, isFutureEvent, daysUntilNextOccurrence } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
-import { Pencil, Trash2, Calendar, Download, CalendarPlus, Clock, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash2, Calendar, Download, CalendarPlus, Clock, MoreHorizontal, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -13,10 +13,11 @@ interface EventCardProps {
   event: DateEvent;
   onEdit: (event: DateEvent) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite?: (event: DateEvent) => void;
   hideActions?: boolean;
 }
 
-export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, onToggleFavorite, hideActions }: EventCardProps) {
   const { years, months, days } = calculateTimeSince(event.date);
   const total = totalDays(event.date);
   const formattedDate = parseLocalDate(event.date).toLocaleDateString("pt-BR");
@@ -24,6 +25,7 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
   const [confirmDelete, setConfirmDelete] = useState(false);
   const future = isFutureEvent(event.date);
   const recurring = !!event.recurring;
+  const favorite = !!event.favorite;
   const showNextOccurrence = recurring && !future;
   const daysToNext = showNextOccurrence ? daysUntilNextOccurrence(event.date) : 0;
 
@@ -63,6 +65,25 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
               </div>
             </div>
             {!hideActions && (
+              <div className="flex items-center gap-0.5">
+                {onToggleFavorite && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => onToggleFavorite(event)}
+                    title={favorite ? "Remover dos favoritos" : "Marcar como favorito"}
+                    aria-pressed={favorite}
+                  >
+                    <Star
+                      className="h-4 w-4"
+                      style={{
+                        fill: favorite ? "hsl(var(--primary))" : "transparent",
+                        color: favorite ? "hsl(var(--primary))" : undefined,
+                      }}
+                    />
+                  </Button>
+                )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -78,6 +99,7 @@ export function EventCard({ event, onEdit, onDelete, hideActions }: EventCardPro
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </div>
             )}
           </div>
 
