@@ -6,6 +6,7 @@ export interface DateEvent {
   label: string;
   category: string;
   date: string; // ISO string
+  recurring?: boolean;
 }
 
 export const EVENT_CATEGORIES = [
@@ -56,17 +57,40 @@ export function totalDays(dateStr: string): number {
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * For a recurring event (yearly), returns the next anniversary date from today.
+ * If today is the anniversary, returns today.
+ */
+export function nextOccurrence(dateStr: string): Date {
+  const original = parseLocalDate(dateStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let candidate = new Date(today.getFullYear(), original.getMonth(), original.getDate());
+  if (candidate.getTime() < today.getTime()) {
+    candidate = new Date(today.getFullYear() + 1, original.getMonth(), original.getDate());
+  }
+  return candidate;
+}
+
+export function daysUntilNextOccurrence(dateStr: string): number {
+  const next = nextOccurrence(dateStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = next.getTime() - today.getTime();
+  return Math.round(diff / (1000 * 60 * 60 * 24));
+}
+
 export async function loadEvents(): Promise<DateEvent[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Não autenticado");
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, label, category, date")
+    .select("id, label, category, date, recurring")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data || []).map((e) => ({ ...e, date: e.date }));
+  return (data || []).map((e) => ({ ...e, date: e.date, recurring: !!e.recurring }));
 }
 
 export async function saveEvent(event: Omit<DateEvent, "id"> & { id?: string }): Promise<DateEvent> {
@@ -76,17 +100,17 @@ export async function saveEvent(event: Omit<DateEvent, "id"> & { id?: string }):
   if (event.id) {
     const { data, error } = await supabase
       .from("events")
-      .update({ label: event.label, category: event.category, date: event.date })
+      .update({ label: event.label, category: event.category, date: event.date, recurring: !!event.recurring })
       .eq("id", event.id)
-      .select("id, label, category, date")
+      .select("id, label, category, date, recurring")
       .single();
     if (error) throw error;
     return data;
   } else {
     const { data, error } = await supabase
       .from("events")
-      .insert({ label: event.label, category: event.category, date: event.date, user_id: user.id })
-      .select("id, label, category, date")
+      .insert({ label: event.label, category: event.category, date: event.date, recurring: !!event.recurring, user_id: user.id })
+      .select("id, label, category, date, recurring")
       .single();
     if (error) throw error;
     return data;
