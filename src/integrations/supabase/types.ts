@@ -21,6 +21,7 @@ export type Database = {
           date: string
           id: string
           label: string
+          recurring: boolean
           user_id: string
         }
         Insert: {
@@ -29,6 +30,7 @@ export type Database = {
           date: string
           id?: string
           label: string
+          recurring?: boolean
           user_id: string
         }
         Update: {
@@ -37,6 +39,7 @@ export type Database = {
           date?: string
           id?: string
           label?: string
+          recurring?: boolean
           user_id?: string
         }
         Relationships: []
