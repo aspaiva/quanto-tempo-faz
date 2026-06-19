@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeft } from "lucide-react";
 
 interface Props {
@@ -33,6 +34,7 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
   const [label, setLabel] = useState("");
   const [date, setDate] = useState<Date | undefined>();
   const [dateText, setDateText] = useState("");
+  const [recurring, setRecurring] = useState(false);
 
   useEffect(() => {
     if (editEvent) {
@@ -42,12 +44,14 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
       const d = parseLocalDate(editEvent.date);
       setDate(d);
       setDateText(`${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`);
+      setRecurring(!!editEvent.recurring);
     } else {
       setStep("category");
       setCategory("");
       setLabel("");
       setDate(undefined);
       setDateText("");
+      setRecurring(false);
     }
   }, [editEvent, open]);
 
@@ -102,6 +106,7 @@ export function EventFormDialog({ open, onOpenChange, onSave, editEvent }: Props
       category,
       label: label.trim(),
       date: date.toISOString(),
+      recurring,
     });
     onOpenChange(false);
   };
