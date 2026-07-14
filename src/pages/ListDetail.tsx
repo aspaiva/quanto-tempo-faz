@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus, ArrowUpDown } from "lucide-react";
+import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus, ArrowUpDown, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 import { SEO } from "@/components/SEO";
 import { HelpButton } from "@/features/help/HelpButton";
+import { ImportEventsDialog } from "@/components/ImportEventsDialog";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -38,6 +39,7 @@ const ListDetail = () => {
   const [newEventOpen, setNewEventOpen] = useState(false);
   const [gcalBatchOpen, setGcalBatchOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
+  const [importOpen, setImportOpen] = useState(false);
 
   const sortedListEvents = useMemo(() => {
     const now = Date.now();
@@ -236,6 +238,9 @@ const ListDetail = () => {
             <Button onClick={() => setAddOpen(true)} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Adicionar evento</span>
             </Button>
+            <Button onClick={() => setImportOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Importar de CSV/Excel">
+              <Upload className="h-4 w-4" /> <span className="hidden sm:inline">Importar</span>
+            </Button>
             <HelpButton />
           </div>
         </div>
@@ -363,6 +368,20 @@ const ListDetail = () => {
       </AlertDialog>
       <EventFormDialog open={newEventOpen} onOpenChange={setNewEventOpen} onSave={handleNewEventSave} editEvent={null} />
       <GoogleCalendarDialog open={gcalBatchOpen} onOpenChange={setGcalBatchOpen} events={listEvents} mode="batch" />
+      <ImportEventsDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        listId={id}
+        onImported={async (imported) => {
+          if (!imported.length || !id) return;
+          const { data } = await supabase
+            .from("events")
+            .select("id, label, category, date, recurring, favorite, user_id")
+            .in("id", imported.map((e) => e.id));
+          if (data) setListEvents((prev) => [...prev, ...(data as ListEventWithOwner[])]);
+          setUserEvents((prev) => [...imported, ...prev]);
+        }}
+      />
     </div>
   );
 };
