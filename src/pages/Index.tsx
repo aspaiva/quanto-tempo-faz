@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
 import { EventFormDialog } from "@/components/EventFormDialog";
-import { DateEvent, loadEvents, saveEvent, deleteEvent, totalDays, setEventFavorite } from "@/lib/events";
+import { DateEvent, loadEvents, saveEvent, deleteEvent, totalDays, setEventFavorite, daysUntilUpcoming } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -16,7 +16,7 @@ import { HelpButton } from "@/features/help/HelpButton";
 import { ImportEventsDialog } from "@/components/ImportEventsDialog";
 
 type ViewMode = "cards" | "list";
-type SortOrder = "closest" | "farthest";
+type SortOrder = "closest" | "farthest" | "upcoming";
 
 const Index = () => {
   const [events, setEvents] = useState<DateEvent[]>([]);
@@ -44,6 +44,9 @@ const Index = () => {
       const aFav = a.favorite ? 0 : 1;
       const bFav = b.favorite ? 0 : 1;
       if (aFav !== bFav) return aFav - bFav;
+      if (sortOrder === "upcoming") {
+        return daysUntilUpcoming(a.date, a.recurring) - daysUntilUpcoming(b.date, b.recurring);
+      }
       const aFuture = new Date(a.date).getTime() > now ? 0 : 1;
       const bFuture = new Date(b.date).getTime() > now ? 0 : 1;
       if (aFuture !== bFuture) return aFuture - bFuture;
@@ -150,14 +153,14 @@ const Index = () => {
               </Button>
             </div>
             <Button
-              onClick={() => setSortOrder((s) => s === "closest" ? "farthest" : "closest")}
+              onClick={() => setSortOrder((s) => s === "closest" ? "farthest" : s === "farthest" ? "upcoming" : "closest")}
               variant="outline"
               size="sm"
               className="gap-1.5 bg-card shadow-sm"
-              title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
+              title={sortOrder === "closest" ? "Mais próximos primeiro" : sortOrder === "farthest" ? "Mais distantes primeiro" : "Próxima ocorrência (independente do ano)"}
             >
               <ArrowUpDown className="h-4 w-4" />
-              <span className="hidden sm:inline">{sortOrder === "closest" ? "Próximos" : "Distantes"}</span>
+              <span className="hidden sm:inline">{sortOrder === "closest" ? "Próximos" : sortOrder === "farthest" ? "Distantes" : "Próxima data"}</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
