@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X, ShieldCheck, Sparkles } from "lucide-react";
+import { Plus, Clock, LogOut, LayoutGrid, List, FolderOpen, ArrowUpDown, Filter, X, ShieldCheck, Sparkles, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/EventCard";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { BiometricPostLoginPrompt } from "@/components/BiometricPostLoginPrompt";
 import { SEO } from "@/components/SEO";
 import { HelpButton } from "@/features/help/HelpButton";
+import { ImportEventsDialog } from "@/components/ImportEventsDialog";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest";
@@ -25,6 +26,7 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
   const navigate = useNavigate();
 
   const existingCategories = useMemo(() => {
@@ -192,6 +194,9 @@ const Index = () => {
             <Button onClick={() => navigate("/lists")} variant="outline" size="sm" className="gap-1.5 bg-card shadow-sm">
               <FolderOpen className="h-4 w-4" /> <span className="hidden sm:inline">Listas</span>
             </Button>
+            <Button onClick={() => setImportOpen(true)} variant="outline" size="sm" className="gap-1.5 bg-card shadow-sm" title="Importar de CSV/Excel">
+              <Upload className="h-4 w-4" /> <span className="hidden sm:inline">Importar</span>
+            </Button>
             <Button onClick={handleOpenNew} size="sm" className="gap-1.5 shadow-sm">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo evento</span>
             </Button>
@@ -282,6 +287,11 @@ const Index = () => {
       </main>
 
       <EventFormDialog open={dialogOpen} onOpenChange={setDialogOpen} onSave={handleSave} editEvent={editEvent} />
+      <ImportEventsDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImported={(imported) => setEvents((prev) => [...imported, ...prev])}
+      />
       <BiometricPostLoginPrompt />
     </div>
   );
