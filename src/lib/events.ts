@@ -81,6 +81,24 @@ export function daysUntilNextOccurrence(dateStr: string): number {
   return Math.round(diff / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Days until the next upcoming occurrence of the event, regardless of year.
+ * - Recurring events: days until next anniversary.
+ * - Non-recurring future events: days until the date.
+ * - Non-recurring past events: days until the same month/day next occurrence
+ *   (treated like an anniversary so users can see the date approaching).
+ */
+export function daysUntilUpcoming(dateStr: string, recurring?: boolean): number {
+  const target = parseLocalDate(dateStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (!recurring && target.getTime() >= today.getTime()) {
+    const diff = target.getTime() - today.getTime();
+    return Math.round(diff / (1000 * 60 * 60 * 24));
+  }
+  return daysUntilNextOccurrence(dateStr);
+}
+
 export async function loadEvents(): Promise<DateEvent[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Não autenticado");

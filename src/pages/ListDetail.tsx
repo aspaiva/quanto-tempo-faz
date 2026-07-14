@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EventCard } from "@/components/EventCard";
 import { EventListItem } from "@/components/EventListItem";
-import { DateEvent, saveEvent, totalDays } from "@/lib/events";
+import { DateEvent, saveEvent, totalDays, daysUntilUpcoming } from "@/lib/events";
 import { parseLocalDate } from "@/lib/utils";
 import { EventFormDialog } from "@/components/EventFormDialog";
 import { getListEvents, addEventToList, removeEventFromList } from "@/lib/lists";
@@ -18,7 +18,7 @@ import { HelpButton } from "@/features/help/HelpButton";
 import { ImportEventsDialog } from "@/components/ImportEventsDialog";
 
 type ViewMode = "cards" | "list";
-type SortOrder = "closest" | "farthest";
+type SortOrder = "closest" | "farthest" | "upcoming";
 
 interface ListEventWithOwner extends DateEvent {
   user_id: string;
@@ -44,6 +44,9 @@ const ListDetail = () => {
   const sortedListEvents = useMemo(() => {
     const now = Date.now();
     const sorted = [...listEvents].sort((a, b) => {
+      if (sortOrder === "upcoming") {
+        return daysUntilUpcoming(a.date, a.recurring) - daysUntilUpcoming(b.date, b.recurring);
+      }
       const aFuture = new Date(a.date).getTime() > now ? 0 : 1;
       const bFuture = new Date(b.date).getTime() > now ? 0 : 1;
       if (aFuture !== bFuture) return aFuture - bFuture;
@@ -221,14 +224,14 @@ const ListDetail = () => {
               </Button>
             </div>
             <Button
-              onClick={() => setSortOrder(s => s === "closest" ? "farthest" : "closest")}
+              onClick={() => setSortOrder(s => s === "closest" ? "farthest" : s === "farthest" ? "upcoming" : "closest")}
               variant="outline"
               size="sm"
               className="gap-1.5"
-              title={sortOrder === "closest" ? "Mais próximos primeiro" : "Mais distantes primeiro"}
+              title={sortOrder === "closest" ? "Mais próximos primeiro" : sortOrder === "farthest" ? "Mais distantes primeiro" : "Próxima ocorrência (independente do ano)"}
             >
               <ArrowUpDown className="h-4 w-4" />
-              <span className="hidden sm:inline">{sortOrder === "closest" ? "Próximos" : "Distantes"}</span>
+              <span className="hidden sm:inline">{sortOrder === "closest" ? "Próximos" : sortOrder === "farthest" ? "Distantes" : "Próxima data"}</span>
             </Button>
             {listEvents.length > 0 && (
               <Button onClick={() => setGcalBatchOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Adicionar todos ao Google Calendar">
