@@ -76,13 +76,28 @@ Deno.serve(async (req) => {
       return html(`Erro ao salvar token: ${escapeHtml(dbError.message)}`, 500);
     }
 
-    if (state.redirectUrl) {
-      const redirectUrl = new URL(state.redirectUrl);
-      redirectUrl.searchParams.set("gcal", "connected");
-      return html(`<script>window.location.href=${JSON.stringify(redirectUrl.toString())};</script>`);
-    }
-
-    return html('<script>if(window.opener){window.opener.postMessage("gcal-connected", window.location.origin);window.close();}else{document.body.innerText="Google Calendar conectado. Pode fechar esta aba.";}</script>');
+    const fallbackUrl = state.redirectUrl
+      ? (() => {
+          const u = new URL(state.redirectUrl);
+          u.searchParams.set("gcal", "connected");
+          return u.toString();
+        })()
+      : "";
+    const fallbackJson = JSON.stringify(fallbackUrl);
+    return html(`<script>
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage("gcal-connected", "*");
+          window.close();
+        } else if (${fallbackJson}) {
+          window.location.href = ${fallbackJson};
+        } else {
+          document.body.innerText = "Google Calendar conectado. Pode fechar esta aba.";
+        }
+      } catch (e) {
+        if (${fallbackJson}) window.location.href = ${fallbackJson};
+      }
+    </script>`);
   } catch (error) {
     return html(`Erro: ${escapeHtml((error as Error).message)}`, 500);
   }
