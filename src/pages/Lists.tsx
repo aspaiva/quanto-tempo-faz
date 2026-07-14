@@ -3,6 +3,16 @@ import { Plus, Clock, LogOut, ArrowLeft, Share2, Trash2, Pencil, Users, Copy, Ch
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { EventList, loadLists, createList, updateList, deleteList, joinListById } from "@/lib/lists";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,6 +30,7 @@ const Lists = () => {
   const [joinOpen, setJoinOpen] = useState(false);
   const [joinId, setJoinId] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -197,7 +208,7 @@ const Lists = () => {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => handleDelete(list.id)}
+                        onClick={() => setConfirmDeleteId(list.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -272,6 +283,29 @@ const Lists = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!confirmDeleteId} onOpenChange={(o) => !o && setConfirmDeleteId(null)}>
+        <AlertDialogContent className="font-body">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">Excluir lista?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. A lista e todos os vínculos com seus eventos serão removidos permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (confirmDeleteId) handleDelete(confirmDeleteId);
+                setConfirmDeleteId(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
