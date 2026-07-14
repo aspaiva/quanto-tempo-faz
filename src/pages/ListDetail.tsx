@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus, ArrowUpDown, Upload } from "lucide-react";
+import { ArrowLeft, Plus, X, Clock, LayoutGrid, List as ListIcon, PlusCircle, CalendarPlus, ArrowUpDown, Upload, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -16,6 +16,7 @@ import { GoogleCalendarDialog } from "@/components/GoogleCalendarDialog";
 import { SEO } from "@/components/SEO";
 import { HelpButton } from "@/features/help/HelpButton";
 import { ImportEventsDialog } from "@/components/ImportEventsDialog";
+import { PrintEventsDialog } from "@/components/PrintEventsDialog";
 
 type ViewMode = "cards" | "list";
 type SortOrder = "closest" | "farthest" | "upcoming";
@@ -40,6 +41,7 @@ const ListDetail = () => {
   const [gcalBatchOpen, setGcalBatchOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>("closest");
   const [importOpen, setImportOpen] = useState(false);
+  const [printOpen, setPrintOpen] = useState(false);
 
   const sortedListEvents = useMemo(() => {
     const now = Date.now();
@@ -244,6 +246,11 @@ const ListDetail = () => {
             <Button onClick={() => setImportOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Importar de CSV/Excel">
               <Upload className="h-4 w-4" /> <span className="hidden sm:inline">Importar</span>
             </Button>
+            {listEvents.length > 0 && (
+              <Button onClick={() => setPrintOpen(true)} variant="outline" size="sm" className="gap-1.5" title="Imprimir eventos da lista">
+                <Printer className="h-4 w-4" /> <span className="hidden sm:inline">Imprimir</span>
+              </Button>
+            )}
             <HelpButton />
           </div>
         </div>
@@ -371,6 +378,12 @@ const ListDetail = () => {
       </AlertDialog>
       <EventFormDialog open={newEventOpen} onOpenChange={setNewEventOpen} onSave={handleNewEventSave} editEvent={null} />
       <GoogleCalendarDialog open={gcalBatchOpen} onOpenChange={setGcalBatchOpen} events={listEvents} mode="batch" />
+      <PrintEventsDialog
+        open={printOpen}
+        onOpenChange={setPrintOpen}
+        events={sortedListEvents}
+        title={listName || "Lista"}
+      />
       <ImportEventsDialog
         open={importOpen}
         onOpenChange={setImportOpen}
