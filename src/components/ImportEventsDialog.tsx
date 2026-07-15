@@ -49,7 +49,11 @@ const MONTH_PT: Record<string, number> = {
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
 
-function parseDate(raw: unknown): { iso: string | null; hasYear: boolean } {
+type DateFormat = "DD/MM" | "MM/DD";
+
+const DEFAULT_YEAR = 2000;
+
+function parseDate(raw: unknown, format: DateFormat): { iso: string | null; hasYear: boolean } {
   if (raw == null || raw === "") return { iso: null, hasYear: false };
 
   // Excel serial date number
@@ -71,19 +75,34 @@ function parseDate(raw: unknown): { iso: string | null; hasYear: boolean } {
   let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if (m) return { iso: `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`, hasYear: true };
 
-  // DD/MM/YYYY or DD-MM-YYYY
+  const pick = (a: number, b: number): [number, number] =>
+    format === "DD/MM" ? [a, b] : [b, a]; // returns [day, month]
+
+  const validate = (day: number, month: number, year: number): string | null => {
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const d = new Date(year, month - 1, day);
+    if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
+    return `${year}-${pad(month)}-${pad(day)}`;
+  };
+
+  // X/Y/YYYY
   m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
   if (m) {
     let year = +m[3];
     if (year < 100) year += year < 50 ? 2000 : 1900;
-    return { iso: `${year}-${pad(+m[2])}-${pad(+m[1])}`, hasYear: true };
+    const [day, month] = pick(+m[1], +m[2]);
+    const iso = validate(day, month, year);
+    if (iso) return { iso, hasYear: true };
+    return { iso: null, hasYear: false };
   }
 
-  // DD/MM (no year)
+  // X/Y (no year) → default year 2000
   m = s.match(/^(\d{1,2})[/\-.](\d{1,2})$/);
   if (m) {
-    const year = new Date().getFullYear();
-    return { iso: `${year}-${pad(+m[2])}-${pad(+m[1])}`, hasYear: false };
+    const [day, month] = pick(+m[1], +m[2]);
+    const iso = validate(day, month, DEFAULT_YEAR);
+    if (iso) return { iso, hasYear: false };
+    return { iso: null, hasYear: false };
   }
 
   // "15 de março [de 2000]" or "15 março 2000"
@@ -92,7 +111,7 @@ function parseDate(raw: unknown): { iso: string | null; hasYear: boolean } {
     const mn = MONTH_PT[normalizeKey(m[2])];
     if (mn) {
       if (m[3]) return { iso: `${m[3]}-${pad(mn)}-${pad(+m[1])}`, hasYear: true };
-      return { iso: `${new Date().getFullYear()}-${pad(mn)}-${pad(+m[1])}`, hasYear: false };
+      return { iso: `${DEFAULT_YEAR}-${pad(mn)}-${pad(+m[1])}`, hasYear: false };
     }
   }
 
@@ -116,6 +135,10 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
   const [parsed, setParsed] = useState<ParsedEvent[]>([]);
   const [defaultCategory, setDefaultCategory] = useState<string>("Outro");
   const [importing, setImporting] = useState(false);
+  const [dateFormat, setDateFormat] = useState<DateFormat>(() => {
+    const saved = typeof window !== "undefined" ? localStorage.getItem("import.dateFormat") : null;
+    return saved === "MM/DD" ? "MM/DD" : "DD/MM";
+  });
 
   const reset = () => {
     setStep("upload");
@@ -162,11 +185,12 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
       toast.error("Selecione as colunas de nome e data");
       return;
     }
+    try { localStorage.setItem("import.dateFormat", dateFormat); } catch { /* ignore */ }
     const results: ParsedEvent[] = rows.map((r) => {
       const label = String(r[labelCol] ?? "").trim();
       const rawDate = r[dateCol];
       const rawCat = categoryCol !== "__none__" ? String(r[categoryCol] ?? "").trim() : "";
-      const { iso, hasYear } = parseDate(rawDate);
+      const { iso, hasYear } = parseDate(rawDate, dateFormat);
       if (!label) return { label: "", category: rawCat || defaultCategory, date: "", recurring: false, valid: false, error: "Sem nome" };
       if (!iso) return { label, category: rawCat || defaultCategory, date: "", recurring: false, valid: false, error: "Data inválida" };
       return {
@@ -297,6 +321,19 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
                     {FLAT_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Formato das datas *</Label>
+                <Select value={dateFormat} onValueChange={(v) => setDateFormat(v as DateFormat)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DD/MM">DD/MM (dia primeiro) — ex.: 06/08 = 6 de agosto</SelectItem>
+                    <SelectItem value="MM/DD">MM/DD (mês primeiro) — ex.: 06/08 = 8 de junho</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Datas sem ano usarão <strong>2000</strong> como padrão e serão marcadas como recorrentes.
+                </p>
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
