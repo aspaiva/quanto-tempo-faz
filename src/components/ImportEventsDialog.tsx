@@ -85,14 +85,23 @@ function parseDate(raw: unknown, format: DateFormat): { iso: string | null; hasY
     return `${year}-${pad(month)}-${pad(day)}`;
   };
 
-  // X/Y/YYYY
-  m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
+  // X/Y/YYYY — só aceita ano com 4 dígitos como "ano informado".
+  // Anos de 2 dígitos são ambíguos, então tratamos como sem ano (default 2000, recorrente).
+  m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/);
   if (m) {
-    let year = +m[3];
-    if (year < 100) year += year < 50 ? 2000 : 1900;
+    const year = +m[3];
     const [day, month] = pick(+m[1], +m[2]);
     const iso = validate(day, month, year);
     if (iso) return { iso, hasYear: true };
+    return { iso: null, hasYear: false };
+  }
+
+  // X/Y/YY (ano de 2 dígitos) → ignora o ano, usa 2000 como padrão
+  m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.]\d{1,2}$/);
+  if (m) {
+    const [day, month] = pick(+m[1], +m[2]);
+    const iso = validate(day, month, DEFAULT_YEAR);
+    if (iso) return { iso, hasYear: false };
     return { iso: null, hasYear: false };
   }
 
