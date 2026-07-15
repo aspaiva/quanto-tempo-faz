@@ -183,7 +183,7 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
             text = new TextDecoder("windows-1252").decode(buf);
           }
         }
-        wb = XLSX.read(text, { type: "string", cellDates: true });
+        wb = XLSX.read(text, { type: "string", raw: true });
       } else {
         const buf = await file.arrayBuffer();
         wb = XLSX.read(buf, { type: "array", cellDates: true });
