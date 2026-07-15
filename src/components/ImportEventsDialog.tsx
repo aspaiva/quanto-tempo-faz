@@ -167,8 +167,27 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
 
   const handleFile = async (file: File) => {
     try {
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type: "array", cellDates: true });
+      const isCSV = /\.csv$/i.test(file.name) || file.type === "text/csv";
+      let wb: XLSX.WorkBook;
+      if (isCSV) {
+        const buf = new Uint8Array(await file.arrayBuffer());
+        // Detecta BOM UTF-8; caso contrário, tenta UTF-8 estrito e faz fallback para windows-1252
+        const hasBOM = buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf;
+        let text: string;
+        if (hasBOM) {
+          text = new TextDecoder("utf-8").decode(buf.subarray(3));
+        } else {
+          try {
+            text = new TextDecoder("utf-8", { fatal: true }).decode(buf);
+          } catch {
+            text = new TextDecoder("windows-1252").decode(buf);
+          }
+        }
+        wb = XLSX.read(text, { type: "string", cellDates: true });
+      } else {
+        const buf = await file.arrayBuffer();
+        wb = XLSX.read(buf, { type: "array", cellDates: true });
+      }
       const sheet = wb.Sheets[wb.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json<Row>(sheet, { defval: "", raw: true });
       if (!json.length) {
