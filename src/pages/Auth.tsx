@@ -36,7 +36,12 @@ const Auth = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const nextPath = redirect && redirect.startsWith("/") ? redirect : "/";
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: `${window.location.origin}${nextPath}` },
+        });
         if (error) throw error;
         toast.success("Conta criada. Verifique seu e-mail para confirmar.");
       }
