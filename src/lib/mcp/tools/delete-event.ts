@@ -17,7 +17,6 @@ export default defineTool({
     id: z.string().uuid().describe("Identificador do evento a excluir."),
   },
   annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
-  needsApproval: true,
   handler: async ({ id }, ctx) => {
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Não autenticado" }], isError: true };
