@@ -19,6 +19,7 @@ interface ParsedEvent {
   date: string; // ISO YYYY-MM-DD
   recurring: boolean;
   valid: boolean;
+  selected: boolean;
   error?: string;
 }
 
@@ -219,14 +220,15 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
       const rawDate = r[dateCol];
       const rawCat = categoryCol !== "__none__" ? String(r[categoryCol] ?? "").trim() : "";
       const { iso, hasYear } = parseDate(rawDate, dateFormat);
-      if (!label) return { label: "", category: rawCat || defaultCategory, date: "", recurring: false, valid: false, error: "Sem nome" };
-      if (!iso) return { label, category: rawCat || defaultCategory, date: "", recurring: false, valid: false, error: "Data inválida" };
+      if (!label) return { label: "", category: rawCat || defaultCategory, date: "", recurring: false, valid: false, selected: false, error: "Sem nome" };
+      if (!iso) return { label, category: rawCat || defaultCategory, date: "", recurring: false, valid: false, selected: false, error: "Data inválida" };
       return {
         label,
         category: rawCat || defaultCategory,
         date: iso,
         recurring: !hasYear,
         valid: true,
+        selected: true,
       };
     });
     setParsed(results);
@@ -234,6 +236,7 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
   };
 
   const validCount = useMemo(() => parsed.filter((p) => p.valid).length, [parsed]);
+  const selectedCount = useMemo(() => parsed.filter((p) => p.valid && p.selected).length, [parsed]);
 
   const updateRow = (idx: number, patch: Partial<ParsedEvent>) => {
     setParsed((prev) => prev.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
@@ -243,12 +246,16 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
     setParsed((prev) => prev.map((p) => ({ ...p, category: cat })));
   };
 
+  const toggleAllSelected = (checked: boolean) => {
+    setParsed((prev) => prev.map((p) => (p.valid ? { ...p, selected: checked } : p)));
+  };
+
   const handleImport = async () => {
     setImporting(true);
     const saved: DateEvent[] = [];
     let failed = 0;
     for (const p of parsed) {
-      if (!p.valid) continue;
+      if (!p.valid || !p.selected) continue;
       try {
         const ev = await saveEvent({
           label: p.label,
@@ -378,7 +385,7 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <div className="flex items-center gap-3">
                 <span className="inline-flex items-center gap-1 text-accent">
-                  <CheckCircle2 className="h-4 w-4" /> {validCount} válido(s)
+                  <CheckCircle2 className="h-4 w-4" /> {selectedCount}/{validCount} selecionado(s)
                 </span>
                 {parsed.length - validCount > 0 && (
                   <span className="inline-flex items-center gap-1 text-destructive">
@@ -401,6 +408,13 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-muted/60 backdrop-blur text-xs uppercase text-muted-foreground">
                   <tr>
+                    <th className="px-2 py-2 text-left font-medium">
+                      <Checkbox
+                        checked={validCount > 0 && selectedCount === validCount}
+                        onCheckedChange={(v) => toggleAllSelected(!!v)}
+                        aria-label="Selecionar todos"
+                      />
+                    </th>
                     <th className="px-2 py-2 text-left font-medium">Nome</th>
                     <th className="px-2 py-2 text-left font-medium">Data</th>
                     <th className="px-2 py-2 text-left font-medium">Categoria</th>
@@ -409,11 +423,22 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
                 </thead>
                 <tbody>
                   {parsed.map((p, idx) => (
-                    <tr key={idx} className={`border-t border-border/50 ${!p.valid ? "bg-destructive/5" : ""}`}>
+                    <tr key={idx} className={`border-t border-border/50 ${!p.valid ? "bg-destructive/5" : ""} ${p.valid && !p.selected ? "opacity-50" : ""}`}>
+                      <td className="px-2 py-1.5">
+                        <Checkbox
+                          checked={p.selected}
+                          disabled={!p.valid}
+                          onCheckedChange={(v) => updateRow(idx, { selected: !!v })}
+                          aria-label="Importar este item"
+                        />
+                      </td>
                       <td className="px-2 py-1.5">
                         <Input
                           value={p.label}
-                          onChange={(e) => updateRow(idx, { label: e.target.value, valid: !!e.target.value.trim() && !!p.date })}
+                          onChange={(e) => {
+                            const nowValid = !!e.target.value.trim() && !!p.date;
+                            updateRow(idx, { label: e.target.value, valid: nowValid, selected: nowValid ? p.selected : false });
+                          }}
                           className="h-8"
                         />
                         {p.error && <span className="text-xs text-destructive">{p.error}</span>}
@@ -422,7 +447,10 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
                         <Input
                           type="date"
                           value={p.date}
-                          onChange={(e) => updateRow(idx, { date: e.target.value, valid: !!p.label.trim() && !!e.target.value })}
+                          onChange={(e) => {
+                            const nowValid = !!p.label.trim() && !!e.target.value;
+                            updateRow(idx, { date: e.target.value, valid: nowValid, selected: nowValid ? p.selected : false });
+                          }}
                           className="h-8"
                         />
                       </td>
@@ -451,8 +479,8 @@ export function ImportEventsDialog({ open, onOpenChange, listId, onImported }: I
 
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="ghost" onClick={() => setStep("map")} disabled={importing}>Voltar</Button>
-              <Button onClick={handleImport} disabled={importing || validCount === 0} className="gap-1.5">
-                {importing ? <><Loader2 className="h-4 w-4 animate-spin" /> Importando...</> : `Importar ${validCount} evento(s)`}
+              <Button onClick={handleImport} disabled={importing || selectedCount === 0} className="gap-1.5">
+                {importing ? <><Loader2 className="h-4 w-4 animate-spin" /> Importando...</> : `Importar ${selectedCount} evento(s)`}
               </Button>
             </div>
           </div>
