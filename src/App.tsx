@@ -15,6 +15,7 @@ import ResetPassword from "./pages/ResetPassword";
 import SecuritySettings from "./pages/SecuritySettings";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
+import OAuthConsent from "./pages/OAuthConsent";
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,7 @@ const App = () => {
             <Route path="/settings/security" element={<RequireAuth session={session}><SecuritySettings /></RequireAuth>} />
             <Route path="/help" element={<Help />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
